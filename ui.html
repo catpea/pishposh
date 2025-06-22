@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visual Programming Language - Subway Map Builder</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #f5f5f5;
+            overflow: hidden;
+            cursor: default;
+        }
+
+        #container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+
+        #svg-canvas {
+            width: 100%;
+            height: 100%;
+            background: #ffffff;
+            cursor: grab;
+        }
+
+        #svg-canvas.dragging {
+            cursor: grabbing;
+        }
+
+        #svg-canvas.station-mode {
+            cursor: crosshair;
+        }
+
+        #svg-canvas.connect-mode {
+            cursor: pointer;
+        }
+
+        #toolbox {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            border: 2px solid #333;
+            border-radius: 8px;
+            padding: 10px;
+            display: flex;
+            gap: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 1000;
+        }
+
+        .tool {
+            width: 40px;
+            height: 40px;
+            border: 2px solid #333;
+            background: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+        }
+
+        .tool:hover {
+            background: #f0f0f0;
+            transform: scale(1.05);
+        }
+
+        .tool.active {
+            background: #e3f2fd;
+            border-color: #1976d2;
+        }
+
+        .tool svg {
+            width: 24px;
+            height: 24px;
+        }
+
+        .grid-line {
+            stroke: #e0e0e0;
+            stroke-width: 0.5;
+            opacity: 0.6;
+        }
+
+        .station {
+            cursor: pointer;
+        }
+
+        .station-circle {
+            fill: white;
+            stroke: black;
+            stroke-width: 3;
+        }
+
+        .station-circle:hover {
+            fill: #f5f5f5;
+        }
+
+        .station-circle.selected {
+            fill: #ff9800;
+            stroke: #f57c00;
+        }
+
+        .connection-line {
+            stroke: #4caf50;
+            stroke-width: 6;
+            fill: none;
+            stroke-linecap: round;
+        }
+
+        .connection-line:hover {
+            stroke: #66bb6a;
+            stroke-width: 8;
+        }
+
+        .label-text {
+            font-family: 'Arial', sans-serif;
+            font-size: 14px;
+            font-weight: bold;
+            fill: #333;
+            text-anchor: middle;
+            dominant-baseline: middle;
+            paint-order: stroke fill;
+            stroke: white;
+            stroke-width: 3;
+            stroke-linejoin: round;
+            cursor: pointer;
+        }
+
+        .station-label {
+            font-size: 12px;
+        }
+
+        .connection-label {
+            font-size: 10px;
+        }
+
+        .temp-line {
+            stroke: #ff5722;
+            stroke-width: 4;
+            fill: none;
+            stroke-dasharray: 5,5;
+            pointer-events: none;
+        }
+
+        #info-panel {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            border: 2px solid #333;
+            border-radius: 8px;
+            padding: 15px;
+            font-size: 12px;
+            max-width: 300px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+
+
+        .grid-line {
+            stroke: #909090;
+            stroke-width: 1;
+            opacity: 0.4;
+            vector-effect: non-scaling-stroke;
+        }
+
+        .grid-line-major {
+            stroke: #707070;
+            stroke-width: 1.5;
+            opacity: 0.6;
+            vector-effect: non-scaling-stroke;
+        }
+
+        .grid-background {
+            fill: #fafafa;
+        }
+
+
+    </style>
+</head>
+<body>
+    <div id="container">
+      <svg id="svg-canvas" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid meet">
+            <defs>
+                <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+                    <path d="M 40 0 L 0 0 0 40" fill="none" class="grid-line"/>
+                </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#grid)"/>
+            <g id="connections-layer"></g>
+            <g id="stations-layer"></g>
+            <g id="labels-layer"></g>
+            <g id="temp-layer"></g>
+        </svg>
+
+        <div id="toolbox">
+            <div class="tool active" id="select-tool" title="Select/Move Tool">
+                <svg viewBox="0 0 24 24">
+                    <path d="M12 2 L22 20 L12 17 L2 20 Z" fill="black" stroke="black" stroke-width="1"/>
+                </svg>
+            </div>
+            <div class="tool" id="station-tool" title="Create Station">
+                <svg viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="10" fill="white" stroke="black" stroke-width="2"/>
+                </svg>
+            </div>
+            <div class="tool" id="connect-tool" title="Connect Stations">
+                <svg viewBox="0 0 24 24">
+                    <rect x="2" y="2" width="20" height="20" fill="#4caf50" stroke="white" stroke-width="2"/>
+                </svg>
+            </div>
+        </div>
+
+        <div id="info-panel">
+            <h3>Visual Programming Language</h3>
+            <p><strong>Select Tool:</strong> Click and drag to move stations</p>
+            <p><strong>Station Tool:</strong> Click on grid to create stations</p>
+            <p><strong>Connect Tool:</strong> Click station, drag to another to connect</p>
+            <p><strong>Navigation:</strong> Drag to pan, scroll to zoom</p>
+            <p><strong>Double-click:</strong> Edit labels</p>
+        </div>
+    </div>
+
+    <script src="index.js" type="module"></script>
+
+</body>
+</html>

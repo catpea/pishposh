@@ -1,0 +1,32 @@
+{
+  "name": "pishposh",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "Signal Framework",
+  "main": "index.js",
+  "scripts": {
+    "app": "~/Applications/nwjs-sdk-v0.93.0-linux-x64/nw .",
+    "web": "http-server -p 8084 -c-1 .",
+    "save": "git add .; git commit -m 'Updated Release'; git push; npm version patch; npm publish; git push;"
+
+  },
+  "keywords": [
+    "visual-programming-language",
+    "graph-editor",
+    "flow-based-programming",
+    "dataflow-programming",
+    "visual-programming",
+    "low-code",
+    "vpl"
+  ],
+  "author": "@catpea",
+  "license": "GPL",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/catpea/pishposh.git"
+  },
+  "bugs": {
+    "url": "https://github.com/catpea/pishposh/issues"
+  },
+  "homepage": "https://github.com/catpea/pishposh#readme"
+}
