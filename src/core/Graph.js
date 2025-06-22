@@ -18,7 +18,7 @@ export class Graph extends Events {
     //   debounce( ()=>this.emit(...args), 1_000 )
     // }
 
-    addNode(x, y, type = 'DefaultAgent', label = 'Station', id = this.generateId()) {
+    addNode({x, y, type = 'StationAgent', label = 'Station', id = this.generateId()}) {
         const node = {
             id,
             x: new Signal(x),
@@ -59,7 +59,7 @@ export class Graph extends Events {
         this.emit('nodeRemoved', node);
     }
 
-    addConnection(fromId, toId, type = 'DefaultConnectionAgent', label = 'Line', id = this.generateId()) {
+    addConnection({fromId, toId, type = 'ConnectionAgent', label = 'Line', id = this.generateId()}) {
         const connection = {
             id,
             type,
@@ -122,12 +122,12 @@ export class Graph extends Events {
         this.connections = new Set();
 
         nodes.forEach(n => {
-            const node = this.addNode(n.x, n.y, n.type, n.label, n.id);
+            const node = this.addNode(n);
             // avoid duplicate events if needed
         });
 
         connections.forEach(c => {
-            const conn = this.addConnection(c.fromId, c.toId, c.type, c.label, c.id);
+            const conn = this.addConnection(c);
         });
     }
 }

@@ -1,0 +1,191 @@
+/* General Resets */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  overflow: hidden;
+  background-color: var(--background);
+  color: var(--text);
+  cursor: default;
+}
+
+#container {
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+}
+
+#svg-canvas {
+  width: 100%;
+  height: 100%;
+  cursor: grab;
+}
+#svg-canvas.dragging {
+  cursor: grabbing;
+}
+#svg-canvas.station-mode {
+  cursor: crosshair;
+}
+#svg-canvas.connect-mode {
+  cursor: pointer;
+}
+
+/* Floating Panels */
+#toolbox {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  background: var(--base02);
+  border: 2px solid var(--base01);
+  border-radius: 8px;
+  padding: 10px;
+  display: flex;
+  gap: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  color: var(--text);
+}
+
+#agent-chooser {
+  position: absolute;
+  top: 120px;
+  left: 20px;
+  background: var(--base02);
+  border: 2px solid var(--base01);
+  border-radius: 8px;
+  padding: 10px;
+  gap: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  color: var(--text);
+  h3 {
+      padding-bottom: 1rem;
+  }
+  .agent-item {
+    padding-bottom: .5rem;
+    cursor: grab;
+
+  }
+}
+
+/* Toolbox Buttons */
+.tool {
+  width: 40px;
+  height: 40px;
+  border: 2px solid var(--base01);
+  background: var(--base03);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+.tool:hover {
+  background: var(--base02);
+}
+.tool.active {
+  background: var(--selected);
+  border-color: var(--primary);
+  color: var(--base02);
+}
+
+/* Grid */
+.grid-layer {
+  pointer-events: none;
+}
+.grid-line {
+  stroke: var(--base01);
+  stroke-width: 0.5;
+  opacity: 0.4;
+  pointer-events: none;
+}
+.grid-line-major {
+  stroke: var(--base00);
+  stroke-width: 1.5;
+  opacity: 0.6;
+  vector-effect: non-scaling-stroke;
+  pointer-events: none;
+}
+.grid-background {
+  fill: var(--background);
+  pointer-events: none;
+}
+
+/* Stations */
+.station {
+  cursor: pointer;
+}
+.station-circle {
+  fill: var(--base03);
+  stroke: var(--text);
+  stroke-width: 3;
+}
+.station-circle.selected {
+  fill: var(--primary);
+  stroke: var(--blue);
+}
+
+/* Connections */
+.connection-line {
+  stroke: var(--green);
+  stroke-width: 6;
+  fill: none;
+  stroke-linecap: round;
+}
+.connection-line:hover {
+  stroke: var(--cyan);
+  stroke-width: 8;
+}
+
+/* Labels */
+.label-text {
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+  font-weight: bold;
+  fill: var(--text);
+  text-anchor: middle;
+  dominant-baseline: middle;
+  paint-order: stroke fill;
+  stroke: var(--background);
+  stroke-width: 3;
+  stroke-linejoin: round;
+  cursor: pointer;
+}
+
+.station-label {
+  font-size: 12px;
+}
+.connection-label {
+  font-size: 10px;
+}
+
+/* Temp Connection Line */
+.temp-line {
+  stroke: var(--orange);
+  stroke-width: 4;
+  fill: none;
+  stroke-dasharray: 5, 5;
+  pointer-events: none;
+}
+
+
+/* Optional UI Enhancements */
+input, select, textarea {
+  background: var(--base03);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 6px;
+  border-radius: 4px;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 1px;
+}

@@ -15,7 +15,41 @@ export class AgentLibraryPlugin {
 
   registerBuiltInAgents() {
 
+    this.registerAgentType( "StationAgent", class StationAgent extends EventEmitter {
+      static hidden = true;
+        constructor(id, config = {}, app) {
+          super();
+          this.name = config.name || "Connection";
+          // example of using a set for subscriptions
+          this.subscriptions = new Set();
+        }
+        start() {
+
+          const stopPiping = this.on("input", (o) => {
+            console.log('ConnectionAgent got input', o)
+            this.emit("output", o);
+          });
+          this.subscriptions.add(stopPiping);
+        }
+        stop() {
+          for (const unsubscribe of this.subscriptions) {
+            unsubscribe();
+          }
+          this.subscriptions.clear();
+        }
+
+        send(input) {
+          this.emit("output", { content: input });
+        }
+      },
+    );
+
     this.registerAgentType( "EchoAgent", class EchoAgent extends EventEmitter {
+      static manifest = {
+        name: 'Echo',
+        name: 'Echo information',
+      }
+
         constructor(id, config = {}, app) {
           super();
           this.name = config.name || "Echo";
@@ -37,7 +71,7 @@ export class AgentLibraryPlugin {
       },
     );
 
-    this.registerAgentType( "ConnectionAgent", class EchoAgent extends EventEmitter {
+    this.registerAgentType( "ConnectionAgent", class ConnectionAgent extends EventEmitter {
         static hidden = true;
         subscriptions;
         constructor(id, config = {}, app) {
@@ -185,7 +219,7 @@ export class AgentLibraryPlugin {
     this.agents.set(name, constructor);
   }
 
-  createAgent(id, type, config={}) {
+  createAgent(id, type='StationAgent', config={}) {
     const AgentClass = this.agents.get(type);
 
     if (!AgentClass) {

@@ -19,7 +19,7 @@ export class PropertiesPanelPlugin {
         const panel = document.createElement('div');
         panel.id = 'properties-panel';
         panel.style.position = 'absolute';
-        panel.style.top = '120px';
+        panel.style.top = '20px';
         panel.style.right = '20px';
         panel.style.width = '250px';
         panel.style.background = 'var(--base02)';

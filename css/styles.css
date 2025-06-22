@@ -35,7 +35,7 @@ body {
 }
 
 /* Floating Panels */
-#toolbox, #agent-chooser {
+#toolbox {
   position: absolute;
   top: 20px;
   left: 20px;
@@ -51,7 +51,25 @@ body {
 }
 
 #agent-chooser {
+  position: absolute;
   top: 120px;
+  left: 20px;
+  background: var(--base02);
+  border: 2px solid var(--base01);
+  border-radius: 8px;
+  padding: 10px;
+  gap: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  color: var(--text);
+  h3 {
+      padding-bottom: 1rem;
+  }
+  .agent-item {
+    padding-bottom: .5rem;
+    cursor: grab;
+
+  }
 }
 
 /* Toolbox Buttons */
@@ -69,11 +87,11 @@ body {
 }
 .tool:hover {
   background: var(--base02);
-  transform: scale(1.05);
 }
 .tool.active {
   background: var(--selected);
   border-color: var(--primary);
+  color: var(--base02);
 }
 
 /* Grid */

@@ -63,7 +63,7 @@ export class ConnectPlugin {
             if (toStationId !== this.fromStationId) {
 
                 this.app.emit('beforeConnectionCreate', { from: this.fromStationId, to: toStationId });
-                this.graph.addConnection(this.fromStationId, toStationId, 'ConnectionAgent');
+                this.graph.addConnection({fromId: this.fromStationId, toId: toStationId, type:'ConnectionAgent'});
             }
         }
 
