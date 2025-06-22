@@ -1,9 +1,12 @@
 // ConnectPlugin.js
+
 export class ConnectPlugin {
+
     constructor() {
         this.isConnecting = false;
         this.fromStationId = null;
         this.tempLine = null;
+
     }
 
     init(app) {
@@ -20,11 +23,14 @@ export class ConnectPlugin {
     }
 
     onMouseDown(e) {
+        this.l('active = ', this.active, e.target.classList, e.target.dataset);
+
         if (!this.active) return;
         if (!e.target.classList.contains('station-circle')) return;
 
-        const stationId = parseInt(e.target.dataset.stationId);
+        const stationId = e.target.dataset.stationId;
         const station = this.graph.nodes.get(stationId);
+        this.l('station', stationId, station)
         if (!station) return;
 
         this.isConnecting = true;
@@ -37,6 +43,7 @@ export class ConnectPlugin {
         this.tempLine.setAttribute('y1', fromPos.y);
         this.tempLine.setAttribute('x2', fromPos.x);
         this.tempLine.setAttribute('y2', fromPos.y);
+
         this.app.layers.temp.appendChild(this.tempLine);
     }
 
@@ -52,11 +59,11 @@ export class ConnectPlugin {
 
         if (e.target.classList.contains('station-circle')) {
 
-            const toStationId = parseInt(e.target.dataset.stationId);
+            const toStationId = e.target.dataset.stationId;
             if (toStationId !== this.fromStationId) {
 
                 this.app.emit('beforeConnectionCreate', { from: this.fromStationId, to: toStationId });
-                this.graph.addConnection(this.fromStationId, toStationId);
+                this.graph.addConnection(this.fromStationId, toStationId, 'ConnectionAgent');
             }
         }
 
@@ -70,5 +77,9 @@ export class ConnectPlugin {
             this.tempLine.remove();
             this.tempLine = null;
         }
+    }
+
+    l(...a){
+      console.log(`${this.constructor.name}:`, ...a);
     }
 }

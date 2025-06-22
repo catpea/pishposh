@@ -44,7 +44,8 @@ export class PanZoomPlugin {
         vb.x -= dx * scaleX;
         vb.y -= dy * scaleY;
 
-        this.app.updateViewBox();
+        this.app.emit('viewBoxChanged');
+
 
         this.lastScreenPos = { x: e.clientX, y: e.clientY };
     }
@@ -73,7 +74,8 @@ export class PanZoomPlugin {
         vb.width = newWidth;
         vb.height = newHeight;
 
-        this.app.updateViewBox();
+        this.app.emit('viewBoxChanged');
+
     }
 
     getSVGCoords(e) {

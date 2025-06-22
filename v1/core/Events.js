@@ -18,8 +18,13 @@ export class Events {
     }
 
     emit(event, data) {
+      // console.warn('emit', event, data)
         if (this.listeners[event]) {
             this.listeners[event].forEach(callback => callback(data));
         }
     }
+}
+
+export class EventEmitter extends Events {
+
 }

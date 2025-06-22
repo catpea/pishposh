@@ -1,0 +1,31 @@
+/* Solarized Dark Theme Base */
+:root {
+  --base03:    #002b36; /* background */
+  --base02:    #073642; /* background highlights */
+
+  --base01:    #586e75; /* comments / secondary content */
+  --base00:    #657b83;
+  --base0:     #839496; /* body text / primary content */
+  --base1:     #93a1a1;
+
+  --base2:     #eee8d5; /* light bg (avoid) */
+  --base3:     #fdf6e3;
+
+  --yellow:    #b58900;
+  --orange:    #cb4b16;
+  --red:       #dc322f;
+  --magenta:   #d33682;
+  --violet:    #6c71c4;
+  --blue:      #268bd2;
+  --cyan:      #2aa198;
+  --green:     #859900;
+
+  --background: var(--base03);
+  --background-highlight: var(--base02);
+  --text: var(--base0);
+  --muted: var(--base01);
+  --accent: var(--cyan);
+  --primary: var(--violet);
+  --selected: var(--blue);
+  --hover: var(--base00);
+}

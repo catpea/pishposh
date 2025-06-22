@@ -16,13 +16,15 @@ export class StationPlugin {
     }
 
     handleClick(e) {
+
         if (this.app.tool !== this.toolId || this.app.isDragging) return;
 
         const pos = this.app.getMousePosition(e);
         const snapped = this.app.snapToGrid(pos.x, pos.y);
 
         this.app.emit('beforeStationCreate', snapped);
-        this.graph.addNode(snapped.x, snapped.y);
+
+        this.graph.addNode(snapped.x, snapped.y, null);
     }
 
     renderStation(station) {
@@ -36,6 +38,10 @@ export class StationPlugin {
         circle.setAttribute('cx', station.x.value);
         circle.setAttribute('cy', station.y.value);
         circle.setAttribute('r', '12');
+
+        circle.addEventListener('click', () => {
+          this.app.emit('selectNode', station)
+        });
 
         const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
         label.setAttribute('class', 'label-text station-label');

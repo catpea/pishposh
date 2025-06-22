@@ -1,4 +1,5 @@
 // utils/ViewUtils.js (or inside SubwayMapBuilder)
+
 export function getVisibleBounds(svg) {
     const rect = svg.getBoundingClientRect();
     const viewBox = svg.viewBox.baseVal;
@@ -26,4 +27,18 @@ export function getVisibleBounds(svg) {
         width: visibleWidth,
         height: visibleHeight
     };
+}
+
+export function getAdaptiveGridSize(width) {
+    const baseSize = 40;
+    const zoomLevel = 1200 / width;
+
+    if (zoomLevel < 0.25) {
+        return baseSize * 4; // Fewer lines when zoomed out
+    } else if (zoomLevel < 0.5) {
+        return baseSize * 2;
+    } else if (zoomLevel > 2) {
+        return baseSize / 2; // More lines when zoomed in
+    }
+    return baseSize;
 }
