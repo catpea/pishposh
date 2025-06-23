@@ -19,6 +19,7 @@ export class Graph extends Events {
     // }
 
     addNode({x, y, type = 'StationAgent', label = 'Station', id = this.generateId()}) {
+
         const node = {
             id,
             x: new Signal(x),
@@ -27,6 +28,7 @@ export class Graph extends Events {
             label: new Signal(label),
             subscriptions: new Set(),
         };
+
         this.nodes.set(id, node);
         this.emit('nodeAdded', node);
 
@@ -59,13 +61,15 @@ export class Graph extends Events {
         this.emit('nodeRemoved', node);
     }
 
-    addConnection({fromId, toId, type = 'ConnectionAgent', label = 'Line', id = this.generateId()}) {
+    addConnection({fromId, toId, type = 'ConnectionAgent', label = 'Line', startLabel='output', endLabel='input',  id = this.generateId()}) {
         const connection = {
             id,
             type,
             fromId,
             toId,
+            startLabel: new Signal(startLabel),
             label: new Signal(label),
+            endLabel: new Signal(endLabel),
             subscriptions: new Set(),
 
         };

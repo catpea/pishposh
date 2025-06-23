@@ -24,7 +24,9 @@ export class StationPlugin {
 
         this.app.emit('beforeStationCreate', snapped);
 
-        this.graph.addNode({x:snapped.x, y:snapped.y});
+        const node = this.graph.addNode({x:snapped.x, y:snapped.y});
+        this.app.emit('selectNode', node)
+
     }
 
     renderStation(station) {

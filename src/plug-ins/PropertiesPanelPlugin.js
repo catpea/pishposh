@@ -47,11 +47,17 @@ export class PropertiesPanelPlugin {
 
         // If agent is available
         const agent = this.app.plugins.get('AgentsPlugin')?.getNodeAgent(node.id);
+
         if (agent) {
             const agentLabel = document.createElement('div');
             agentLabel.innerHTML = `<strong>Agent:</strong> ${agent.constructor.name}`;
             this.panel.appendChild(agentLabel);
         }
+
+
+        nameInput.querySelector('input').select()
+
+
     }
 
     showConnectionProperties(connection) {
@@ -60,6 +66,12 @@ export class PropertiesPanelPlugin {
 
         const nameInput = this.createLabeledInput('Label', connection.label.value, val => connection.label.value = val);
         this.panel.appendChild(nameInput);
+
+        const startInput = this.createLabeledInput('Start', connection.startLabel.value, val => connection.startLabel.value = val);
+        this.panel.appendChild(startInput);
+
+        const endInput = this.createLabeledInput('End', connection.endLabel.value, val => connection.endLabel.value = val);
+        this.panel.appendChild(endInput);
 
         const from = document.createElement('div');
         from.textContent = `From: ${connection.fromId}`;
@@ -76,9 +88,13 @@ export class PropertiesPanelPlugin {
             agentLabel.innerHTML = `<strong>Agent:</strong> ${agent.constructor.name}`;
             this.panel.appendChild(agentLabel);
         }
+
+        nameInput.querySelector('input').select()
+
     }
 
     createLabeledInput(label, value, onChange) {
+
         const wrapper = document.createElement('div');
         wrapper.style.marginBottom = '8px';
 

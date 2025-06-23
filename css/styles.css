@@ -131,7 +131,7 @@ body {
 }
 
 /* Connections */
-.connection-line {
+/* .connection-line {
   stroke: var(--green);
   stroke-width: 6;
   fill: none;
@@ -140,7 +140,7 @@ body {
 .connection-line:hover {
   stroke: var(--cyan);
   stroke-width: 8;
-}
+} */
 
 /* Labels */
 .label-text {
@@ -152,17 +152,36 @@ body {
   dominant-baseline: middle;
   paint-order: stroke fill;
   stroke: var(--background);
-  stroke-width: 3;
+  stroke-width: 2;
   stroke-linejoin: round;
   cursor: pointer;
+  letter-spacing: 0.01em;
 }
 
 .station-label {
   font-size: 12px;
 }
 .connection-label {
-  font-size: 10px;
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+  font-weight: bold;
+  fill: var(--text);
+  dominant-baseline: middle;
+  paint-order: stroke fill;
+  stroke: var(--background);
+  stroke-width: 3;
+  stroke-linejoin: round;
+  cursor: pointer;
+  letter-spacing: 0.01em;
 }
+
+.connection-path {
+  stroke: var(--green);
+  stroke-width: 6;
+  fill: none;
+  stroke-linecap: round;
+}
+
 
 /* Temp Connection Line */
 .temp-line {
