@@ -1,5 +1,5 @@
 // GridPlugin.js
-import { getVisibleBounds, getAdaptiveGridSize } from '../utils/ViewUtils.js';
+import { getVisibleBounds, getAdaptiveGridSize } from '../core/Utils.js';
 
 export class GridPlugin {
     constructor() {
@@ -16,6 +16,8 @@ export class GridPlugin {
 
         // Re-render grid on viewBox change
         app.on('viewBoxChanged', () => this.renderGrid());
+        window.addEventListener('resize', () => this.renderGrid());
+
     }
 
     renderGrid() {

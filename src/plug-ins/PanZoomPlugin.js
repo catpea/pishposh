@@ -1,3 +1,6 @@
+import { getVisibleBounds } from '../core/Utils.js';
+
+
 // PanZoomPlugin.js
 export class PanZoomPlugin {
     constructor() {
@@ -35,7 +38,9 @@ export class PanZoomPlugin {
         const dx = e.clientX - this.lastScreenPos.x;
         const dy = e.clientY - this.lastScreenPos.y;
 
-        const rect = this.svg.getBoundingClientRect();
+        // const rect = this.svg.getBoundingClientRect();
+        const rect = getVisibleBounds(this.svg);
+
         const vb = this.app.viewBox;
 
         const scaleX = vb.width / rect.width;
@@ -60,26 +65,17 @@ export class PanZoomPlugin {
 
     onWheel(e) {
         e.preventDefault();
-
-        const svgPoint = this.getSVGCoords(e);
+        const mousePosition = this.getMousePosition(e);
         const zoomFactor = e.deltaY > 0 ? 1.1 : 0.9;
-        const vb = this.app.viewBox;
-
-        const newWidth = vb.width * zoomFactor;
-        const newHeight = vb.height * zoomFactor;
-
-        vb.x += (vb.width - newWidth) * ((svgPoint.x - vb.x) / vb.width);
-        vb.y += (vb.height - newHeight) * ((svgPoint.y - vb.y) / vb.height);
-
-        vb.width = newWidth;
-        vb.height = newHeight;
-
+        this.zoomAt(mousePosition.x, mousePosition.y, zoomFactor);
         this.app.emit('viewBoxChanged');
 
     }
 
     getSVGCoords(e) {
-        const rect = this.svg.getBoundingClientRect();
+        // const rect = this.svg.getBoundingClientRect();
+        const rect =  getVisibleBounds(this.svg);
+
         const vb = this.app.viewBox;
 
         const x = ((e.clientX - rect.left) / rect.width) * vb.width + vb.x;
@@ -87,4 +83,55 @@ export class PanZoomPlugin {
 
         return { x, y };
     }
+
+
+
+    zoomAt(x, y, factor) {
+        const vb = this.app.viewBox;
+
+        const newWidth = vb.width * factor;
+        const newHeight = vb.height * factor;
+
+        vb.x += (vb.width - newWidth) * ((x - vb.x) / vb.width);
+        vb.y += (vb.height - newHeight) * ((y - vb.y) / vb.height);
+        vb.width = newWidth;
+        vb.height = newHeight;
+
+        // this.zoom = 1200 / vb.width;
+        // this.svg.setAttribute('viewBox', `${vb.x} ${vb.y} ${vb.width} ${vb.height}`);
+
+
+        }
+
+        getMousePosition(e) {
+             const rect = this.svg.getBoundingClientRect();
+             const viewBox = this.svg.viewBox.baseVal;
+
+             // Calculate aspect ratios
+             const viewportAspect = rect.width / rect.height;
+             const viewBoxAspect = viewBox.width / viewBox.height;
+
+             let scaleX, scaleY, offsetX = 0, offsetY = 0;
+
+             if (viewportAspect > viewBoxAspect) {
+                 // Viewport is wider - letterboxing on sides
+                 scaleY = viewBox.height / rect.height;
+                 scaleX = scaleY;
+                 const scaledWidth = viewBox.width / scaleX;
+                 offsetX = (rect.width - scaledWidth) / 2;
+             } else {
+                 // Viewport is taller - letterboxing on top/bottom
+                 scaleX = viewBox.width / rect.width;
+                 scaleY = scaleX;
+                 const scaledHeight = viewBox.height / scaleY;
+                 offsetY = (rect.height - scaledHeight) / 2;
+             }
+
+             // Convert client coordinates to SVG coordinates
+             const x = (e.clientX - rect.left - offsetX) * scaleX + viewBox.x;
+             const y = (e.clientY - rect.top - offsetY) * scaleY + viewBox.y;
+
+             return { x, y };
+         }
+
 }

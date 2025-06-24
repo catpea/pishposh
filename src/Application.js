@@ -1,7 +1,7 @@
 // SubwayMapBuilder.js
 import { Events } from './core/Events.js';
 import { Graph } from './core/Graph.js';
-import { getVisibleBounds } from './utils/ViewUtils.js';
+import { getVisibleBounds } from './core/Utils.js';
 
 
 
