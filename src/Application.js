@@ -1,16 +1,17 @@
 // SubwayMapBuilder.js
-import { Events } from './core/Events.js';
+import { EventEmitter, ReactiveSignal as Signal } from "./core/Signal.js";
 import { Graph } from './core/Graph.js';
 import { getVisibleBounds } from './core/Utils.js';
 
 
 
 
-export class Application extends Events {
+export class Application extends EventEmitter {
     constructor(svgElement) {
         super();
 
-        this.tool = null;
+        // All Plugins Use This
+        this.tool = new Signal();
 
         this.svg = svgElement;
         this.viewBox = { x: 0, y: 0, width: 1200, height: 800 };
@@ -32,10 +33,6 @@ export class Application extends Events {
     }
 
     init() {
-
-      this.on('toolSelected', toolId=>{
-        this.tool = toolId;
-      });
 
       this.on('viewBoxChanged', ()=>{
         this.updateViewBox();

@@ -1,4 +1,3 @@
-// AgentsPlugin.js
 export class AgentsPlugin {
     constructor() {
         this.nodeAgents = new Map();
@@ -8,6 +7,7 @@ export class AgentsPlugin {
     init(app) {
         this.app = app;
         this.graph = app.graph;
+
         this.library = app.plugins.get('AgentLibraryPlugin');
 
         // Create agents when graph elements are added

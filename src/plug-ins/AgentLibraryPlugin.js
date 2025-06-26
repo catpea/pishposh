@@ -1,6 +1,5 @@
 import { EventEmitter } from "../core/Events.js";
 
-// AgentLibraryPlugin.js
 // Manages definitions of agent types and their constructors.
 export class AgentLibraryPlugin {
   constructor() {
@@ -10,7 +9,6 @@ export class AgentLibraryPlugin {
   init(app) {
     this.app = app;
     this.registerBuiltInAgents();
-    console.log("agent list", this.listAgents());
   }
 
   registerBuiltInAgents() {

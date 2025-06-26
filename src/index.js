@@ -47,7 +47,7 @@ export class SubwayBuilder extends HTMLElement {
         // Agent system
         app.use(new AgentLibraryPlugin());
         app.use(new AgentsPlugin());
-        app.use(new AgentChooserPlugin());
+        app.use(new AgentChooserPlugin({showTitle: false}));
         app.use(new PropertiesPanelPlugin());
 
         app.init();

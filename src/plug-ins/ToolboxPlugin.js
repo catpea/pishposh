@@ -1,56 +1,76 @@
-// ToolboxPlugin.js
+import { ReactiveSignal as Signal } from "../core/Signal.js";
+
 export class ToolboxPlugin {
-    constructor() {
-        this.tools = [
-            { id: 'select',  icon: 'bi-arrows-move'},
-            { id: 'station', icon: 'bi-node-plus-fill'},
-            { id: 'connect', icon: 'bi-bezier2' }
-        ];
 
-        this.currentTool = 'select';
-    }
+  constructor() {
 
-    init(app) {
-        this.app = app;
-        this.createToolbox();
-        this.selectTool('select');
-    }
+    this.toolboxTools = new Signal([]);
 
-    createToolbox() {
-        const toolbox = document.createElement('div');
-        toolbox.id = 'toolbox';
+    // this.tools1 = [
+    //   { id: "select", icon: "bi-arrows-move" },
+    //   { id: "station", icon: "bi-node-plus-fill" },
+    //   { id: "connect", icon: "bi-bezier2" },
+    // ];
 
-        this.tools.forEach(tool => {
+  }
 
-            const button = document.createElement('div');
-            button.classList.add('tool');
-            button.id = `${tool.id}-tool`;
-            button.title = tool.id.charAt(0).toUpperCase() + tool.id.slice(1);
+  init(app) {
 
-            const icon = document.createElement('i');
-            icon.classList.add('bi', tool.icon);
-            button.appendChild(icon);
+    this.app = app;
+    this.svg = this.app.svg;
 
-            toolbox.appendChild(button);
-            button.addEventListener('click', () => this.selectTool(tool.id));
+    this.#createToolbox();
 
-        });
+    const isToolAlreadyPresentFn = (tool) => !this.toolboxElement.querySelector(`div.tool[id=${tool.id}-tool]`);
+    // this.toolboxTools.subscribe((tools) => tools.filter(isToolAlreadyPresentFn).forEach((tool) => this.#addToolboxTool(tool)));
 
-        document.getElementById('container').appendChild(toolbox);
-    }
+    console.log(this.toolboxTools, this.toolboxTools.filter)
 
-    selectTool(toolId) {
+    this.toolboxTools
+    .iterate()
+    .filter(isToolAlreadyPresentFn)
+    .subscribe((tool, thing)=>{
+      this.#addToolboxTool(tool);
+      console.log('New Tool', tool.id)
+      console.dir( thing.path)
+    });
 
-        this.currentTool = toolId;
-        this.app.emit('toolSelected', toolId);
+  }
 
-        document.querySelectorAll('.tool').forEach(el => el.classList.remove('active'));
-        document.getElementById(`${toolId}-tool`).classList.add('active');
+  registerTool(tool) {
+    this.toolboxTools.value = [tool, ...this.toolboxTools.value];
+  }
 
-        const svg = this.app.svg;
-        svg.classList.remove('station-mode', 'connect-mode');
+  #createToolbox() {
+    this.toolboxElement = document.createElement("div");
+    this.toolboxElement.id = "toolbox";
+    document.getElementById("container").appendChild(this.toolboxElement);
+  }
 
-        if (toolId === 'station') svg.classList.add('station-mode');
-        if (toolId === 'connect') svg.classList.add('connect-mode');
-    }
+  #addToolboxTool(tool) {
+    const button = document.createElement("div");
+    button.classList.add("tool");
+    button.id = `${tool.id}-tool`;
+    button.title = tool.id.charAt(0).toUpperCase() + tool.id.slice(1);
+
+    const icon = document.createElement("i");
+    icon.classList.add("bi", tool.icon);
+    button.appendChild(icon);
+
+    toolbox.appendChild(button);
+    button.addEventListener("click", () => this.selectTool(tool.id));
+  }
+
+  selectTool(toolId) {
+    if (!this.toolboxTools.value.find((item) => item.id === toolId)) throw new Error("No such tool.");
+
+    this.app.tool.value = toolId;
+    console.log(this.app.tool.value)
+
+    document.querySelectorAll(".tool").forEach((el) => el.classList.remove("active"));
+    document.getElementById(`${toolId}-tool`).classList.add("active");
+
+    this.svg.setAttribute('data-mode', `${toolId}-mode`);
+
+  }
 }

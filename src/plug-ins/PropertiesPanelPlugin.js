@@ -1,4 +1,3 @@
-// PropertiesPanelPlugin.js
 export class PropertiesPanelPlugin {
     constructor() {
         this.selected = null;
@@ -23,7 +22,7 @@ export class PropertiesPanelPlugin {
         panel.style.right = '20px';
         panel.style.width = '250px';
         panel.style.background = 'var(--base02)';
-        panel.style.border = '2px solid var(--base01)';
+        panel.style.border = '2px solid var(--base03)';
         panel.style.borderRadius = '8px';
         panel.style.padding = '10px';
         panel.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.5)';

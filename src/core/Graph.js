@@ -1,8 +1,8 @@
 import { Signal } from './Signal.js';
-import { Events } from './Events.js';
+import { EventEmitter } from './Events.js';
 import { debounce } from './Utils.js';
 
-export class Graph extends Events {
+export class Graph extends EventEmitter {
     constructor() {
         super();
         this.metadata = new Map();

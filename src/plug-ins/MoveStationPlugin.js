@@ -1,55 +1,74 @@
-// MoveStationPlugin.js
+import { ReactiveSignal as Signal } from "../core/Signal.js";
+
 export class MoveStationPlugin {
-    constructor() {
-        this.draggingStation = null;
-        this.dragOffset = { x: 0, y: 0 };
-    }
 
-    init(app) {
-        this.app = app;
-        this.svg = app.svg;
-        this.graph = app.graph;
+  toolId = "select";
+  toolActive = new Signal(false);
+  subscriptions = new Set();
 
-        this.svg.addEventListener('mousedown', this.onMouseDown.bind(this));
-        this.svg.addEventListener('mousemove', this.onMouseMove.bind(this));
-        this.svg.addEventListener('mouseup', this.onMouseUp.bind(this));
-    }
+  constructor() {
+    this.draggingStation = null;
+    this.dragOffset = { x: 0, y: 0 };
+  }
 
-    onMouseDown(e) {
-        if (this.app.tool !== 'select') return;
+  init(app) {
+    this.app = app;
+    this.svg = app.svg;
+    this.graph = app.graph;
 
-        const target = e.target.closest('.station-circle');
-        if (!target) return;
+    this.svg.addEventListener("mousedown", this.onMouseDown.bind(this));
+    this.svg.addEventListener("mousemove", this.onMouseMove.bind(this));
+    this.svg.addEventListener("mouseup", this.onMouseUp.bind(this));
 
-        const id = target.dataset.stationId;
-        const station = this.graph.nodes.get(id);
-        if (!station) return;
+    // Register Tool
+    this.toolbox = app.plugins.get("ToolboxPlugin");
+    this.toolbox.registerTool({ id: this.toolId, icon: "bi-arrows-move" });
 
-        const pos = this.app.getMousePosition(e);
-        this.draggingStation = station;
-        this.dragOffset.x = pos.x - station.x.value;
-        this.dragOffset.y = pos.y - station.y.value;
+    // Monitor For Tool Selection Active
+    const toolMonitorSubscription = this.app.tool.map(appTool=>appTool==this.toolId).subscribe(active=>this.toolActive.value=active);
+    this.app.tool.map(appTool=>console.log('map', appTool, appTool==this.toolId));
 
-        this.svg.classList.add('dragging');
-        e.stopPropagation();
-    }
+    this.subscriptions.add(toolMonitorSubscription);
 
-    onMouseMove(e) {
-        if (!this.draggingStation || this.app.tool !== 'select') return;
+  }
 
-        const pos = this.app.getMousePosition(e);
-        const snapped = this.app.snapToGrid(pos.x - this.dragOffset.x, pos.y - this.dragOffset.y);
+  onMouseDown(e) {
+    if (!this.toolActive.value) return;
 
-        this.draggingStation.x.value = snapped.x;
-        this.draggingStation.y.value = snapped.y;
-        e.stopPropagation();
-    }
+    const target = e.target.closest(".station-circle");
+    if (!target) return;
 
-    onMouseUp(e) {
-        if (!this.draggingStation) return;
+    const id = target.dataset.stationId;
+    const station = this.graph.nodes.get(id);
+    if (!station) return;
 
-        this.draggingStation = null;
-        this.svg.classList.remove('dragging');
-        e.stopPropagation();
-    }
+    const pos = this.app.getMousePosition(e);
+    this.draggingStation = station;
+    this.dragOffset.x = pos.x - station.x.value;
+    this.dragOffset.y = pos.y - station.y.value;
+
+    this.svg.classList.add("dragging");
+    e.stopPropagation();
+  }
+
+  onMouseMove(e) {
+    if (!this.toolActive.value) return;
+
+    if (!this.draggingStation) return;
+
+    const pos = this.app.getMousePosition(e);
+    const snapped = this.app.snapToGrid(pos.x - this.dragOffset.x, pos.y - this.dragOffset.y);
+
+    this.draggingStation.x.value = snapped.x;
+    this.draggingStation.y.value = snapped.y;
+    e.stopPropagation();
+  }
+
+  onMouseUp(e) {
+    if (!this.draggingStation) return;
+
+    this.draggingStation = null;
+    this.svg.classList.remove("dragging");
+    e.stopPropagation();
+  }
 }

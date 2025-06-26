@@ -1,4 +1,5 @@
 /* General Resets */
+
 * {
   margin: 0;
   padding: 0;
@@ -40,48 +41,23 @@ body {
   top: 20px;
   left: 20px;
   background: var(--base02);
-  border: 2px solid var(--base01);
+  border: 2px solid var(--base03);
   border-radius: 8px;
-  padding: 10px;
-  display: flex;
-  gap: 10px;
+  padding: 0.25rem;
+  columns: 2;
+  gap: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
   z-index: 1000;
   color: var(--text);
 }
-
-#agent-chooser {
-  position: absolute;
-  top: 120px;
-  left: 20px;
-  background: var(--base02);
-  border: 2px solid var(--base01);
-  border-radius: 8px;
-  padding: 10px;
-  gap: 10px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-  z-index: 1000;
-  color: var(--text);
-  h3 {
-      padding-bottom: 1rem;
-  }
-  .agent-item {
-    padding-bottom: .5rem;
-    cursor: grab;
-
-  }
-}
-
 /* Toolbox Buttons */
 .tool {
-  width: 40px;
-  height: 40px;
+  padding: 0.2rem 0.3rem;
+  margin-bottom: 8px;
+
   border: 2px solid var(--base01);
   background: var(--base03);
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   border-radius: 4px;
   transition: all 0.2s ease;
 }
@@ -89,9 +65,45 @@ body {
   background: var(--base02);
 }
 .tool.active {
-  background: var(--selected);
+  /* background: var(--selected); */
   border-color: var(--primary);
-  color: var(--base02);
+  color: var(--selected);
+}
+
+#agent-chooser {
+  position: absolute;
+
+  bottom: 20px;
+  left: 20px;
+  min-width: 128px;
+
+  background: var(--base02);
+  border: 2px solid var(--base03);
+  border-radius: 8px;
+
+  padding: 1rem;
+
+  gap: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  color: var(--text);
+  font-weight: bold;
+
+  h3 {
+    padding-bottom: 1rem;
+  }
+
+  .agent-item:not(:last-child) {
+    padding-bottom: 0.3rem;
+  }
+
+  .agent-item {
+    cursor: grab;
+
+    :hover {
+      color: var(--hover);
+    }
+  }
 }
 
 /* Grid */
@@ -182,7 +194,6 @@ body {
   stroke-linecap: round;
 }
 
-
 /* Temp Connection Line */
 .temp-line {
   stroke: var(--orange);
@@ -192,9 +203,10 @@ body {
   pointer-events: none;
 }
 
-
 /* Optional UI Enhancements */
-input, select, textarea {
+input,
+select,
+textarea {
   background: var(--base03);
   border: 1px solid var(--border);
   color: var(--text);

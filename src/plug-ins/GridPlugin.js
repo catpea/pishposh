@@ -1,4 +1,3 @@
-// GridPlugin.js
 import { getVisibleBounds, getAdaptiveGridSize } from '../core/Utils.js';
 
 export class GridPlugin {
