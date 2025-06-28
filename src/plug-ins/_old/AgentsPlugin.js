@@ -8,7 +8,7 @@ export class AgentsPlugin {
         this.app = app;
         this.graph = app.graph;
 
-        this.library = app.plugins.get('AgentLibraryPlugin');
+        this.agentLibrary = app.plugins.get('AgentLibraryPlugin');
 
         // Create agents when graph elements are added
         this.graph.on('nodeAdded', node => this.createNodeAgent(node));
@@ -23,7 +23,7 @@ export class AgentsPlugin {
     createNodeAgent(node) {
 
         const agentType = node.type;
-        const agent = this.library.createAgent(node.id, agentType);
+        const agent = this.agentLibrary.createAgent(node.id, agentType);
         console.log('Lol!', agentType,  agent)
 
 
@@ -40,9 +40,9 @@ export class AgentsPlugin {
             this.app.emit('agentOutput', { nodeId: node.id, data: e.detail });
         });
 
-        this.app.emit('agentCreated', { kind: 'node', id: node.id, agent });
+        this.app.emit('agentCreated',  agent );
         agent.start()
-        this.app.emit('agentStarted', { kind: 'node', id: node.id, agent });
+        this.app.emit('agentStarted',  agent );
         console.log('agentStarted', { kind: 'node', id: node.id, agent });
     }
 
@@ -53,8 +53,8 @@ export class AgentsPlugin {
         const toAgent = this.nodeAgents.get(connection.toId);
 
         const agentType = connection.type;
-        const connectionAgent = this.library.createAgent(connection.id, agentType);
-        this.app.emit('agentCreated', { kind: 'connection', id: connection.id, agent: connectionAgent, fromAgent, toAgent });
+        const connectionAgent = this.agentLibrary.createAgent(connection.id, agentType);
+        this.app.emit('connectionCreated',  connectionAgent );
 
         if (!connectionAgent) {
             console.warn(`No connection agent found for type: ${agentType}`);

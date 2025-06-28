@@ -36,4 +36,6 @@
   --primary: var(--violet);
   --selected: var(--blue);
   --hover: var(--violet);
+  --border: var(--base01, #586e75);
+  --focus-ring: var(--blue, #268bd2);
 }

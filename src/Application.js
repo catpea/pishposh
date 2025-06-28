@@ -1,5 +1,5 @@
 // SubwayMapBuilder.js
-import { EventEmitter, ReactiveSignal as Signal } from "./core/Signal.js";
+import { ReactiveEmitter as EventEmitter, ReactiveSignal as Signal } from "./core/Signal.js";
 import { Graph } from './core/Graph.js';
 import { getVisibleBounds } from './core/Utils.js';
 

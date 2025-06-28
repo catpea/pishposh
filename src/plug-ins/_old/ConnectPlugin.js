@@ -38,13 +38,14 @@ export class ConnectPlugin {
 
     const stationId = e.target.dataset.stationId;
     const station = this.graph.nodes.get(stationId);
-    this.l("station", stationId, station);
+
     if (!station) return;
 
     this.isConnecting = true;
     this.fromStationId = stationId;
 
     const fromPos = { x: station.x.value, y: station.y.value };
+
     this.tempLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
     this.tempLine.setAttribute("class", "temp-line");
     this.tempLine.setAttribute("x1", fromPos.x);

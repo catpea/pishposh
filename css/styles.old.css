@@ -1,0 +1,291 @@
+/* Solarized Dark Theme Base */
+:root {
+  --base03:    #002b36; /* background */
+  --base02:    #073642; /* background highlights */
+
+  --base01:    #586e75; /* comments / secondary content */
+  --base00:    #657b83;
+  --base0:     #839496; /* body text / primary content */
+  --base1:     #93a1a1;
+
+  --base2:     #eee8d5; /* light bg (avoid) */
+  --base3:     #fdf6e3;
+
+  /* Warning */
+  --green:     #859900;
+  --yellow:    #b58900;
+  --orange:    #cb4b16;
+
+  /* Danger */
+  --red:       #dc322f;
+  --magenta:   #d33682;
+
+  /* Info */
+  --violet:    #6c71c4;
+  --blue:      #268bd2;
+
+  /* Success */
+  --cyan:      #2aa198;
+
+  --background: var(--base03);
+  --background-highlight: var(--base02);
+  --text: var(--base0);
+  --muted: var(--base01);
+  --accent: var(--cyan);
+  --primary: var(--violet);
+  --selected: var(--blue);
+  --hover: var(--violet);
+  --border: var(--base01, #586e75);
+  --focus-ring: var(--blue, #268bd2);
+}
+
+/* General Resets */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 20px;
+  font-family: 'Courier New', monospace;
+  overflow: hidden;
+  background-color: var(--background);
+  color: var(--text);
+  cursor: default;
+}
+
+/* Layout Containers */
+.container, #container {
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+/* SVG Canvas */
+#svg-canvas,
+.svg-container {
+  width: 100%;
+  height: 100%;
+  display: block;
+  border: 1px solid #333;
+  overflow: hidden;
+  background: #111;
+  cursor: grab;
+  touch-action: none;
+}
+#svg-canvas:active,
+svg:active {
+  cursor: grabbing;
+}
+
+/* Floating Panels */
+#toolbox {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  background: var(--base02);
+  border: 2px solid var(--base03);
+  border-radius: 8px;
+  padding: 0.25rem;
+  columns: 2;
+  gap: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  color: var(--text);
+}
+
+/* Toolbox Buttons */
+.tool {
+  padding: 0.2rem 0.3rem;
+  margin-bottom: 8px;
+  border: 2px solid var(--base01);
+  background: var(--base03);
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+.tool:hover {
+  background: var(--base02);
+}
+.tool.active {
+  border-color: var(--primary);
+  color: var(--selected);
+}
+
+/* Agent Chooser Panel */
+#agent-chooser {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  min-width: 128px;
+  background: var(--base02);
+  border: 2px solid var(--base03);
+  border-radius: 8px;
+  padding: 1rem;
+  gap: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+  z-index: 1000;
+  color: var(--text);
+  font-weight: bold;
+}
+#agent-chooser h3 {
+  padding-bottom: 1rem;
+  margin: 0;
+}
+#agent-chooser .agent-item {
+  cursor: grab;
+}
+#agent-chooser .agent-item:not(:last-child) {
+  padding-bottom: 0.3rem;
+}
+#agent-chooser .agent-item:hover {
+  color: var(--hover);
+}
+
+/* Grid */
+.grid-layer {
+  pointer-events: none;
+}
+.grid-line {
+  stroke: var(--base01);
+  stroke-width: 0.5;
+  opacity: 0.4;
+  pointer-events: none;
+}
+.grid-line-major,
+.grid-major {
+  stroke: var(--base00, #555);
+  stroke-width: 1.5;
+  opacity: 0.6;
+  vector-effect: non-scaling-stroke;
+  pointer-events: none;
+}
+.grid-background {
+  fill: var(--background);
+  pointer-events: none;
+}
+.grid-label {
+  fill: #888;
+  font-size: 10px;
+  font-family: 'Courier New', monospace;
+  text-anchor: middle;
+  dominant-baseline: middle;
+}
+
+/* Axis and Origin */
+.axis {
+  stroke: #777;
+  stroke-width: 2;
+}
+.origin {
+  fill: #ff6b6b;
+  stroke: #fff;
+  stroke-width: 1;
+}
+
+/* Stations */
+.station {
+  cursor: pointer;
+}
+.station-circle {
+  fill: var(--base03);
+  stroke: var(--text);
+  stroke-width: 3;
+}
+.station-circle.selected {
+  fill: var(--primary);
+  stroke: var(--blue);
+}
+.station-port {
+  fill: var(--primary);
+  stroke: var(--blue);
+}
+
+/* Connection Path */
+.connection-path {
+  stroke: var(--green);
+  stroke-width: 6;
+  fill: none;
+  stroke-linecap: round;
+}
+
+/* Temp Connection Line */
+.temp-line {
+  stroke: var(--orange);
+  stroke-width: 4;
+  fill: none;
+  stroke-dasharray: 5, 5;
+  pointer-events: none;
+}
+
+/* Labels */
+.label-text,
+.connection-label {
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+  font-weight: bold;
+  fill: var(--text);
+  text-anchor: middle;
+  dominant-baseline: middle;
+  paint-order: stroke fill;
+  stroke: var(--background);
+  stroke-width: 2;
+  stroke-linejoin: round;
+  cursor: pointer;
+  letter-spacing: 0.01em;
+}
+.station-label {
+  font-size: 12px;
+}
+.connection-label {
+  stroke-width: 3;
+}
+
+/* Controls and Info */
+.header {
+  padding: 10px 0;
+  margin-bottom: 20px;
+}
+.controls {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.info {
+  font-size: 12px;
+  color: #888;
+  display: flex;
+  gap: 20px;
+}
+
+/* General Form Elements */
+input, select, textarea {
+  background: var(--base03);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 6px;
+  border-radius: 4px;
+}
+input:focus, select:focus, textarea:focus {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 1px;
+}
+
+/* Button */
+button {
+  background: var(--base02);
+  border: 1px solid var(--border);
+  padding: 8px 12px;
+  cursor: pointer;
+  border-radius: 4px;
+  font-family: inherit;
+  color: var(--text);
+  transition: background 0.2s;
+}
+button:hover {
+  background: var(--base03);
+}

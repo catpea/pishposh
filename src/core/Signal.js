@@ -1,7 +1,13 @@
+export function rid() { // Generate ID
+  const specs = [[3,'abcdefghijklmnopqrstuvwxyz'],[6, 'abcdefghijklmnopqrstuvwxyz0123456789']]
+  return specs.map(([length,chars])=>[...Array(length)].map(() => chars[Math.floor(Math.random() * chars.length)]).join("")).join('');
+}
+
 export class EventEmitter {
   events;
   constructor() {
     this.events = new Map();
+    this.unsubscribe = new Set();
   }
   on(event, subscriber) {
     if (!this.events.has(event)) {
@@ -20,6 +26,10 @@ export class EventEmitter {
     }
   }
   terminate() {
+
+    this.unsubscribe.forEach((subscriber) => subscriber());
+    this.unsubscribe.clear();
+
     this.events.forEach((subscribers) => subscribers.clear());
     this.events.clear();
   }
@@ -29,13 +39,25 @@ class StreamEmitter extends EventEmitter {
   name = "StreamEmitter";
   source; // source emitter
 
+  // SIGNAL INTEGRATION - Makes StreamEmitter behave a little bit like a signal
+  replayLast = false;
+  lastValue = null;
+  lastValueTest = (v)=>v!==null;
+
   constructor() {
     super();
   }
+
   emitValue(value) {
+    if(this.replayLast) this.lastValue = value;
+
     this.emit("value", value);
   }
   subscribe(subscriber) {
+
+    // SIGNAL INTEGRATION
+    if(this.replayLast && this.lastValueTest(this.lastValue)) subscriber(this.lastValue)
+
     this.on("value", (v) => subscriber(v, this));
     return () => this.off("value", subscriber);
   }
@@ -59,6 +81,10 @@ class StreamEmitter extends EventEmitter {
 export class ReactiveEmitter extends StreamEmitter {
 
   name = "ReactiveEmitter";
+
+  fromEvent(...argv) {
+    return fromEvent(this, ...argv);
+  }
 
   iterate(...argv) {
     return iterate(this, ...argv);
@@ -107,17 +133,27 @@ export class Signal {
   #id;
   #value;
   #test;
+  #same;
   #subscribers;
 
   // NOTE: Re: test=v=>!v==undefined... null and undefined are considered equal when using the loose equality operator
 
-  constructor(value, test = (v) => !v == undefined) {
+  constructor(value, same = (a,b) => a==b, test = (v) => v !== undefined) {
     this.#value = value;
     this.#test = test;
+    this.#same = same;
     this.#subscribers = new Set();
   }
+
+  get(){
+    return this.value;
+  }
+  set(v){
+    this.value = v;
+  }
+
   get id() {
-    if (!this.#id) this.#id = this.sid();
+    if (!this.#id) this.#id = rid();
     return this.#id;
   }
 
@@ -126,6 +162,7 @@ export class Signal {
   }
 
   set value(newValue) {
+    if (this.#same(this.#value, newValue)) return;
     this.#value = newValue;
     this.notify();
   }
@@ -140,11 +177,6 @@ export class Signal {
     for (const subscriber of this.#subscribers) subscriber(this.#value);
   }
 
-  static sid() { // Generate Signal ID
-    const length = 12;
-    const chars = "abcdefghijklmnopqrstuvwxyz";
-    return [...Array(length)].map(() => chars[Math.floor(Math.random() * chars.length)]).join("");
-  }
 }
 
 export class ReactiveSignal extends Signal {
@@ -194,7 +226,7 @@ export class ReactiveSignal extends Signal {
 
 // Object Stream Operators
 
-function iterate(source) {
+export function iterate(source) {
   const result = new ReactiveEmitter();
   result.name = "iterate";
   result.source = source;
@@ -205,7 +237,7 @@ function iterate(source) {
   return result;
 }
 
-function map(source, predicate) {
+export function map(source, predicate) {
   const result = new ReactiveEmitter();
   result.name = "filter";
   result.source = source;
@@ -217,7 +249,7 @@ function map(source, predicate) {
   return result;
 }
 
-function filter(source, predicate) {
+export function filter(source, predicate) {
   const result = new ReactiveEmitter();
   result.name = "filter";
   result.source = source;
@@ -231,7 +263,7 @@ function filter(source, predicate) {
   return result;
 }
 
-function debounce(source, ms) {
+export function debounce(source, ms) {
   const result = new ReactiveEmitter();
   result.name = "debounce";
   result.source = source;
@@ -249,7 +281,7 @@ function debounce(source, ms) {
 }
 
 // Distinct filters out all duplicate values from an observable sequence, while distinctUntilChanged only removes consecutive duplicates, allowing the first occurrence of each value to pass through. This means distinctUntilChanged is useful for preventing repeated emissions of the same value in a row.
-function distinctUntilChanged(source, compareFn = (a, b) => a === b) {
+export function distinctUntilChanged(source, compareFn = (a, b) => a === b) {
   const result = new ReactiveEmitter();
   result.name = "distinctUntilChanged";
   result.source = source;
@@ -266,7 +298,7 @@ function distinctUntilChanged(source, compareFn = (a, b) => a === b) {
   return result;
 }
 
-function scan(source, accumulator, seed) {
+export function scan(source, accumulator, seed) {
   const result = new ReactiveEmitter();
   result.name = "scan";
   result.source = source;
@@ -281,7 +313,7 @@ function scan(source, accumulator, seed) {
   return result;
 }
 
-function delay(source, ms) {
+export function delay(source, ms) {
   const result = new ReactiveEmitter();
   result.name = "delay";
   result.source = source;
@@ -293,7 +325,7 @@ function delay(source, ms) {
   return result;
 }
 
-function throttle(source, ms) {
+export function throttle(source, ms) {
   const result = new ReactiveEmitter();
   result.name = "throttle";
   result.source = source;
@@ -311,7 +343,7 @@ function throttle(source, ms) {
   return result;
 }
 
-function withLatestFrom(source, other) {
+export function withLatestFrom(source, other) {
   const result = new ReactiveEmitter();
   result.name = "withLatestFrom";
   result.source = source;
@@ -331,7 +363,7 @@ function withLatestFrom(source, other) {
   return result;
 }
 
-function merge(...emitters) {
+export function merge(...emitters) {
   const result = new ReactiveEmitter();
   result.name = "merge";
   result.source = source;
@@ -342,3 +374,103 @@ function merge(...emitters) {
 
   return result;
 }
+
+// export function fromEvent(source, eventName) {
+//   const result = new ReactiveEmitter();
+
+//   result.name = "fromEvent";
+//   result.source = source;
+
+//   source.on(eventName, value => {
+//     result.emitValue(value);
+//   });
+
+//   return result;
+
+// }
+export function fromEvent(source, eventName) {
+  const result = new ReactiveEmitter();
+  result.name = "fromEvent";
+  result.source = source;
+
+  // Create a function to handle the event
+  const eventHandler = (value) => {
+    result.emitValue(value);
+  };
+
+  // Check if the source is a DOM element or an event emitter
+  if (source instanceof EventTarget) {
+    // For DOM events
+    source.addEventListener(eventName, eventHandler);
+
+    // Add the unsubscribe function to the Set
+    result.unsubscribe.add(() => {
+      source.removeEventListener(eventName, eventHandler);
+    });
+  } else {
+    // For other event emitters
+    source.on(eventName, eventHandler);
+
+    // Add the unsubscribe function to the Set
+    result.unsubscribe.add(() => {
+      source.off(eventName, eventHandler); // Assuming there's an off method
+    });
+  }
+
+  return result;
+}
+
+
+
+
+export function namedCombineLatest(namedSignals) {
+  console.log({namedSignals})
+  const result = new ReactiveEmitter();
+  result.replayLast = true;
+  result.name = "watchNamed";
+
+  const signalNames = Object.keys(namedSignals);
+  // const emitters = Object.values(namedSignals);
+  const values = new Array(signalNames.length);
+  const hasValue = new Array(signalNames.length).fill(false);
+
+  let completedCount = 0;
+
+  Object.entries(namedSignals).forEach(([name, signal], index) => {
+
+    signal.subscribe((value) => {
+
+      values[index] = value;
+      hasValue[index] = true;
+
+      // Check if all emitters have emitted at least once
+      console.log('ZZZ hasValue.every(Boolean)', hasValue.every(Boolean), hasValue)
+      if (hasValue.every(Boolean)) {
+
+        const entries = new Array(signalNames.length);
+        for( const [index, name] of signalNames.entries()){
+          entries[index] = [name, values[index]];
+        }
+        const obj = Object.fromEntries(entries)
+        console.log('ZZZ REESDY>', obj)
+        result.emitValue(obj); // Emit an array of values
+      }
+    }); // subscribe to emitter
+
+  });
+
+  return result;
+}
+
+// [x] iterate
+// [x] map
+// [x] filter
+// [x] debounce
+// [x] distinctUntilChanged
+// [x] scan
+// [x] delay
+// [x] throttle
+// [x] withLatestFrom
+// [x] merge
+
+// TODO, add these operators

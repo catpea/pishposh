@@ -1,5 +1,5 @@
-import { Signal } from './Signal.js';
-import { EventEmitter } from './Events.js';
+import { ReactiveEmitter as EventEmitter, ReactiveSignal as Signal } from './Signal.js';
+
 import { debounce } from './Utils.js';
 
 export class Graph extends EventEmitter {
@@ -18,10 +18,11 @@ export class Graph extends EventEmitter {
     //   debounce( ()=>this.emit(...args), 1_000 )
     // }
 
-    addNode({x, y, type = 'StationAgent', label = 'Station', id = this.generateId()}) {
+    addNode({r=12, x, y, type = 'StationAgent', label = 'Station', id = this.generateId()}) {
 
         const node = {
             id,
+            r: new Signal(r),
             x: new Signal(x),
             y: new Signal(y),
             type,
@@ -42,6 +43,11 @@ export class Graph extends EventEmitter {
         node.subscriptions.add(labelSubscription);
 
         return node;
+    }
+
+    getNode(id) {
+      const node = this.nodes.get(id);
+      return node;
     }
 
     removeNode(id) {
@@ -102,6 +108,7 @@ export class Graph extends EventEmitter {
             metadata: Array.from(this.metadata.entries()),
             nodes: Array.from(this.nodes.values()).map(node => ({
                 id: node.id,
+                r: node.r.value,
                 x: node.x.value,
                 y: node.y.value,
                 type: node.type,

@@ -1,222 +1,115 @@
-/* General Resets */
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
 body {
-  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 20px;
+  font-family: "Courier New", monospace;
   overflow: hidden;
   background-color: var(--background);
-  color: var(--text);
-  cursor: default;
 }
 
-#container {
-  width: 100vw;
+.container {
+  display: flex;
+  flex-direction: column;
   height: 100vh;
-  position: relative;
 }
 
-#svg-canvas {
+.header {
+  padding: 10px 0;
+  margin-bottom: 20px;
+}
+
+.controls {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.info {
+  font-size: 12px;
+  color: #888;
+  display: flex;
+  gap: 20px;
+}
+
+.svg-container {
+  flex: 1;
+  border: 2px solid var(--base02);
+  overflow: hidden;
+  background-color: var(--background);
+
+}
+
+svg {
   width: 100%;
   height: 100%;
   cursor: grab;
 }
-#svg-canvas.dragging {
+
+svg:active {
   cursor: grabbing;
 }
-#svg-canvas.station-mode {
-  cursor: crosshair;
-}
-#svg-canvas.connect-mode {
-  cursor: pointer;
-}
 
-/* Floating Panels */
-#toolbox {
-  position: absolute;
-  top: 20px;
-  left: 20px;
-  background: var(--base02);
-  border: 2px solid var(--base03);
-  border-radius: 8px;
-  padding: 0.25rem;
-  columns: 2;
-  gap: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-  z-index: 1000;
-  color: var(--text);
-}
-/* Toolbox Buttons */
-.tool {
-  padding: 0.2rem 0.3rem;
-  margin-bottom: 8px;
-
-  border: 2px solid var(--base01);
-  background: var(--base03);
-  cursor: pointer;
-  border-radius: 4px;
-  transition: all 0.2s ease;
-}
-.tool:hover {
-  background: var(--base02);
-}
-.tool.active {
-  /* background: var(--selected); */
-  border-color: var(--primary);
-  color: var(--selected);
-}
-
-#agent-chooser {
-  position: absolute;
-
-  bottom: 20px;
-  left: 20px;
-  min-width: 128px;
-
-  background: var(--base02);
-  border: 2px solid var(--base03);
-  border-radius: 8px;
-
-  padding: 1rem;
-
-  gap: 10px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-  z-index: 1000;
-  color: var(--text);
-  font-weight: bold;
-
-  h3 {
-    padding-bottom: 1rem;
-  }
-
-  .agent-item:not(:last-child) {
-    padding-bottom: 0.3rem;
-  }
-
-  .agent-item {
-    cursor: grab;
-
-    :hover {
-      color: var(--hover);
-    }
-  }
-}
-
-/* Grid */
-.grid-layer {
-  pointer-events: none;
-}
 .grid-line {
-  stroke: var(--base01);
+  stroke: #333;
   stroke-width: 0.5;
-  opacity: 0.4;
-  pointer-events: none;
-}
-.grid-line-major {
-  stroke: var(--base00);
-  stroke-width: 1.5;
-  opacity: 0.6;
-  vector-effect: non-scaling-stroke;
-  pointer-events: none;
-}
-.grid-background {
-  fill: var(--background);
-  pointer-events: none;
 }
 
-/* Stations */
-.station {
-  cursor: pointer;
-}
-.station-circle {
-  fill: var(--base03);
-  stroke: var(--text);
-  stroke-width: 3;
-}
-.station-circle.selected {
-  fill: var(--primary);
-  stroke: var(--blue);
+.grid-major {
+  stroke: #555;
+  stroke-width: 1;
 }
 
-/* Connections */
-/* .connection-line {
-  stroke: var(--green);
-  stroke-width: 6;
-  fill: none;
-  stroke-linecap: round;
-}
-.connection-line:hover {
-  stroke: var(--cyan);
-  stroke-width: 8;
-} */
-
-/* Labels */
-.label-text {
-  font-family: Arial, sans-serif;
-  font-size: 14px;
-  font-weight: bold;
-  fill: var(--text);
+.grid-label {
+  fill: #888;
+  font-size: 10px;
+  font-family: "Courier New", monospace;
   text-anchor: middle;
   dominant-baseline: middle;
-  paint-order: stroke fill;
-  stroke: var(--background);
+}
+
+.axis {
+  stroke: #777;
   stroke-width: 2;
-  stroke-linejoin: round;
-  cursor: pointer;
-  letter-spacing: 0.01em;
 }
 
-.station-label {
-  font-size: 12px;
-}
-.connection-label {
-  font-family: Arial, sans-serif;
-  font-size: 14px;
-  font-weight: bold;
-  fill: var(--text);
-  dominant-baseline: middle;
-  paint-order: stroke fill;
-  stroke: var(--background);
-  stroke-width: 3;
-  stroke-linejoin: round;
-  cursor: pointer;
-  letter-spacing: 0.01em;
+.origin {
+  fill: #ff6b6b;
+  stroke: #fff;
+  stroke-width: 1;
 }
 
-.connection-path {
-  stroke: var(--green);
-  stroke-width: 6;
-  fill: none;
-  stroke-linecap: round;
-}
 
-/* Temp Connection Line */
-.temp-line {
-  stroke: var(--orange);
-  stroke-width: 4;
-  fill: none;
-  stroke-dasharray: 5, 5;
-  pointer-events: none;
-}
 
-/* Optional UI Enhancements */
-input,
-select,
-textarea {
+
+
+
+
+
+
+
+/* General Form Elements */
+input, select, textarea {
   background: var(--base03);
   border: 1px solid var(--border);
   color: var(--text);
   padding: 6px;
   border-radius: 4px;
 }
-
-input:focus,
-select:focus,
-textarea:focus {
+input:focus, select:focus, textarea:focus {
   outline: 2px solid var(--focus-ring);
   outline-offset: 1px;
+}
+
+/* Button */
+button {
+  background: var(--base02);
+  border: 1px solid var(--border);
+  padding: 8px 12px;
+  cursor: pointer;
+  border-radius: 4px;
+  font-family: inherit;
+  color: var(--text);
+  transition: background 0.2s;
+}
+button:hover {
+  background: var(--base03);
 }

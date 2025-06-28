@@ -1,4 +1,4 @@
-import { EventEmitter } from "../core/Events.js";
+import { ReactiveEmitter as EventEmitter } from '../core/Signal.js';
 
 // Manages definitions of agent types and their constructors.
 export class AgentLibraryPlugin {
@@ -15,9 +15,17 @@ export class AgentLibraryPlugin {
 
     this.registerAgentType( "StationAgent", class StationAgent extends EventEmitter {
       static hidden = true;
+
+      ports = [
+        {id:'input', type:'in', format: 'data/object' },
+        {id:'output', type:'out', format: 'data/object' },
+        {id: 'predicate', type:'in', format: 'data/function' },
+      ];
+
         constructor(id, config = {}, app) {
           super();
-          this.name = config.name || "Connection";
+          this.id = id;
+          this.name = config.name || "Station";
           // example of using a set for subscriptions
           this.subscriptions = new Set();
         }
@@ -39,6 +47,7 @@ export class AgentLibraryPlugin {
         send(input) {
           this.emit("output", { content: input });
         }
+
       },
     );
 
@@ -52,6 +61,7 @@ export class AgentLibraryPlugin {
 
         constructor(id, config = {}, app) {
           super();
+          this.id = id;
           this.name = config.name || "Echo";
         }
         start() {
@@ -76,6 +86,7 @@ export class AgentLibraryPlugin {
         subscriptions;
         constructor(id, config = {}, app) {
           super();
+          this.id = id;
           this.name = config.name || "Connection";
           // example of using a set for subscriptions
           this.subscriptions = new Set();
@@ -111,6 +122,7 @@ export class AgentLibraryPlugin {
 
       constructor(id, config = {}, app) {
           super();
+          this.id = id;
           this.interval = config.interval || 1000;
           this.timer = null;
           this.subscriptions = new Set();
@@ -146,7 +158,8 @@ export class AgentLibraryPlugin {
       static hidden = true;
 
         constructor(id, config = {}, app) {
-            super();
+          super();
+          this.id = id;
             this.app = app; // The main application
             this.subscriptions = new Set();
 
@@ -226,6 +239,10 @@ export class AgentLibraryPlugin {
 
   registerAgentType(name, constructor) {
     this.agents.set(name, constructor);
+  }
+
+  getAgentType(name) {
+    this.agents.get(name);
   }
 
   createAgent(id, type='StationAgent', config={}) {
