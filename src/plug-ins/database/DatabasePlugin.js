@@ -1,5 +1,5 @@
 import { rid, ReactiveSignal as Signal, namedCombineLatest } from "../../core/Signal.js";
-import { StoredMap } from './StoredMap.js';
+import { PersistentMap } from './PersistentMap.js';
 
 export class DatabasePlugin {
   app;
@@ -13,21 +13,8 @@ export class DatabasePlugin {
 
   init(app) {
     this.app = app;
-
-    // this.databases = new StoredMap(null, {prefix: 'pishposh-databases'});
-
-    this.pishposhStations = new StoredMap(null, {prefix: 'pishposh-stations'});
-    this.app.on('stationAdded', data => this.pishposhStations.set(data.id, data));
-    this.app.on('stationRemoved', id => this.pishposhStations.delete(id));
-
-    this.pishposhPorts = new StoredMap(null, {prefix: 'pishposh-ports'});
-    this.app.on('portAdded', conn => this.pishposhPorts.set(data.id, data));
-    this.app.on('portRemoved', id => this.pishposhPorts.delete(id));
-
-    this.pishposhConnections = new StoredMap(null, {prefix: 'pishposh-connections'});
-    this.app.on('connectionAdded', data => this.pishposhConnections.set(data.id, data));
-    this.app.on('connectionRemoved', id => this.pishposhConnections.delete(id));
-
+    this.startRestore()
+    // this.app.on('startRestore', ()=>this.startRestore())
   }
 
   stop() {
@@ -38,6 +25,39 @@ export class DatabasePlugin {
   eventDispatch(...argv){
     console.info('eventDispatch', ...argv);
     this.app.emit(...argv);
+  }
+
+  startRestore(){
+
+    // this.databases = new StoredMap(null, {prefix: 'pishposh-databases'});
+
+    // this.pishposhStations = new PersistentMap(null, {prefix: 'pishposh-stations', onRestored:db=>db.forEach((v,k)=>this.app.emit('stationRestore', v))});
+    this.pishposhStations = new PersistentMap(null, {prefix: 'pishposh-stations', onRestored:db=>{
+      console.log(db)
+
+      for (const item of db){
+      console.log(item)
+
+      };
+
+      db.forEach((v,k)=>{
+        console.info('stationRestore', v)
+        this.app.emit('stationRestore', v)
+      })
+    }
+    });
+
+    this.app.on('stationAdded', data => this.pishposhStations.set(data.id, data.serialize()));
+    this.app.on('stationRemoved', id => this.pishposhStations.delete(id));
+
+    this.pishposhPorts = new PersistentMap(null, {prefix: 'pishposh-ports', onRestored:db=>db.forEach((v,k)=>this.app.emit('portRestore', v))});
+    this.app.on('portAdded', conn => this.pishposhPorts.set(data.id, data.serialize()));
+    this.app.on('portRemoved', id => this.pishposhPorts.delete(id));
+
+    this.pishposhConnections = new PersistentMap(null, {prefix: 'pishposh-connections', onRestored:db=>db.forEach((v,k)=>this.app.emit('connectionRestore', v))});
+    this.app.on('connectionAdded', data => this.pishposhConnections.set(data.id, data.serialize()));
+    this.app.on('connectionRemoved', id => this.pishposhConnections.delete(id));
+
   }
 
 }

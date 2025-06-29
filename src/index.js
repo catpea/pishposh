@@ -31,50 +31,49 @@ export class SubwayBuilder extends HTMLElement {
     connectedCallback() {
         this.innerHTML = `
 
-          <div class="container">
-              <div class="header">
+          <div class="ui-container">
 
-                  <div class="controls">
-                      <button title="Reset View" onclick="app.plugins.get('WorkbenchPlugin').engine.resetZoom()"><i class="bi bi-search"></i></button>
-                      <button title="Zoom In" onclick="app.plugins.get('WorkbenchPlugin').engine.zoomIn()"><i class="bi bi-zoom-in"></i></button>
-                      <button title="Zoom Out" onclick="app.plugins.get('WorkbenchPlugin').engine.zoomOut()"><i class="bi bi-zoom-out"></i></button>
-                      <i class="bi bi-three-dots-vertical" style="align-content: center; color: var(--base01);"></i>
-                      <button title=""><i class="bi bi-lock"></i></button>
-                      <button title=""><i class="bi bi-floppy"></i></button>
+                  <div class="toolbox snapped-top snapped-end rounded shadow" tabindex="-1" style="width: 15vw; min-height: 25vh;">
+                    <div class="toolbox-body p-3">
+                      <small class="text-info">properties</small>
+                    </div>
                   </div>
 
-                  <div class="info">
-                      <span id="pan-info">Pan: (0, 0)</span>
-                      <span id="scale-info">Scale: 1.00</span>
-                      <span id="mouse-info1">Mouse: (0, 0)</span>
-                      <span id="mouse-info2">Mouse: (0, 0)</span>
+                  <div class="toolbox snapped-top snapped-start rounded shadow" tabindex="-1" style="width: 4.21rem;">
+                    <div class="toolbox-body p-1" style="columns: 2; gap: .5rem;">
+
+                        <button class="btn btn-sm" title="Reset View" onclick="app.emit('switchTool','select')"><i class="bi bi-arrows-move"></i></button>
+                        <button class="btn btn-sm" title="Reset View" onclick="app.emit('switchTool','connect')"><i class="bi bi-bezier2"></i></button>
+                        <button class="btn btn-sm" title="Reset View" onclick="app.emit('switchTool','delete')"><i class="bi bi-trash"></i></button>
+
+                        <button class="btn btn-sm" title="Reset View" onclick="app.plugins.get('WorkbenchPlugin').engine.resetZoom()"><i class="bi bi-search"></i></button>
+                        <button class="btn btn-sm" title="Zoom In" onclick="app.emit('switchTool','zoomin')"; app.plugins.get('WorkbenchPlugin').engine.zoomIn()"><i class="bi bi-zoom-in"></i></button>
+                        <button class="btn btn-sm" title="Zoom Out" onclick="app.emit('switchTool','zoomout')"; app.plugins.get('WorkbenchPlugin').engine.zoomOut()"><i class="bi bi-zoom-out"></i></button>
+                        <button class="btn btn-sm" title=""><i class="bi bi-lock"></i></button>
+                        <button class="btn btn-sm" title=""><i class="bi bi-floppy"></i></button>
+                    </div>
                   </div>
 
-              </div>
+                  <div class="toolbox snapped-bottom snapped-center rounded" tabindex="-1" style="min-height: 3rem;">
+                    <div class="toolbox-body p-3">
+                      <small  class="text-info"id="pan-info">Pan: (0, 0)</small>
+                      <small  class="text-info"id="scale-info">Scale: 1.00</small>
+                      <small  class="text-info"id="mouse-info1">Mouse: (0, 0)</small>
+                      <small  class="text-info"id="mouse-info2">Mouse: (0, 0)</small>
+                    </div>
+                  </div>
+
+
 
               <div class="svg-container">
                   <svg id="main-svg">
-
                       <defs>
                       </defs>
-
                       <g id="viewport">
-
-                          <g id="groups-layer"></g>
-                          <g id="connections-layer"></g>
-                          <g id="stations-layer"></g>
-                          <g id="labels-layer"></g>
-                          <g id="temp-layer"></g>
-
-                          <!-- Content area for geometry testing -->
-                          <g id="content">
-
-                          </g>
-
                       </g>
-
                   </svg>
               </div>
+
           </div>
         `;
 
@@ -82,7 +81,6 @@ export class SubwayBuilder extends HTMLElement {
         const svg = this.querySelector('#main-svg');
         const app = new Application(svg);
 
-        app.use(new DatabasePlugin());
         app.use(new WorkbenchPlugin());
 
         // Core plugins
@@ -91,8 +89,8 @@ export class SubwayBuilder extends HTMLElement {
         // app.use(new PanZoomPlugin());
 
         // Station System
-        app.use(new StationManagerPlugin());
         app.use(new StationVisualizationPlugin());
+        app.use(new StationManagerPlugin());
 
         // app.use(new StationPlugin());
         // app.use(new ConnectPlugin());
@@ -104,6 +102,7 @@ export class SubwayBuilder extends HTMLElement {
         // app.use(new AgentsPlugin());
         // app.use(new AgentChooserPlugin({showTitle: false}));
         // app.use(new PropertiesPanelPlugin());
+        app.use(new DatabasePlugin());
 
         app.init();
         window.app = app; // Debug access

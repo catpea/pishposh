@@ -1,5 +1,5 @@
 // SubwayMapBuilder.js
-import { ReactiveEmitter as EventEmitter, ReactiveSignal as Signal } from "./core/Signal.js";
+import { ReactiveEmitter as EventEmitter,  ReactiveEventSourcingStream, ReactiveSignal as Signal } from "./core/Signal.js";
 import { Graph } from './core/Graph.js';
 import { getVisibleBounds } from './core/Utils.js';
 
@@ -12,11 +12,20 @@ export class Application extends EventEmitter {
 
         // All Plugins Use This
         this.tool = new Signal();
+        this.log = new ReactiveEventSourcingStream();
 
         this.svg = svgElement;
         this.viewBox = { x: 0, y: 0, width: 1200, height: 800 };
         this.zoom = 1;
         this.tileSize = 40;
+
+        this.tools = {
+          select: 'select-tool',
+          connect: 'connect-tool',
+          delete: 'delete-tool',
+          zoomin: 'zoom-in-tool',
+          zoomout: 'zoom-out-tool',
+        };
 
         this.layers = {
           grid: document.createElementNS('http://www.w3.org/2000/svg', 'g'),
@@ -38,8 +47,22 @@ export class Application extends EventEmitter {
         this.updateViewBox();
       });
 
-        Object.values(this.layers).forEach(layer => this.svg.appendChild(layer));
+      this.on('switchTool', (toolId)=>{
+        this.svg.setAttribute('data-tool', this.tools[toolId])
+      });
+
+
+
+
+
+        const viewport = this.svg.querySelector('#viewport');
+
+        Object.values(this.layers).forEach(layer => viewport.appendChild(layer));
         this.updateViewBox();
+
+
+
+
     }
 
     use(plugin) {

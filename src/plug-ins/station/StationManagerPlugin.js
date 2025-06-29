@@ -2,48 +2,107 @@ import { rid, ReactiveSignal as Signal, namedCombineLatest, fromEvent } from "..
 
 class Station {
 
-  constructor({ id, x, y, r=32 }) {
-    this.#id = id || rid();
+  // this allows for this[name] access
+  #signalStorage = {};
 
-    // Warn if x, y, or r is missing
-    if (x === undefined || y === undefined || r === undefined) {
-      console.warn(`Station created with missing parameters: ${JSON.stringify({ x, y, r })}`);
-    }
+  #defaults = {
+    x:0,
+    y:0,
+    r:32,
+    label: 'Untitled',
+    type: 'station/plain',
+  };
 
-    this.x = x;
-    this.y = y;
-    this.r = r;
+  #acceptable = [
+    'id','x','y','r','label','type'
+  ];
 
+  #serializable = [
+    'id','x','y','r','label','type'
+  ]
+
+  constructor(configure) {
+    const enriched = Object.assign({}, this.#defaults, configure );
+    const picked = this.#pick(this.#acceptable, enriched);
+    console.log('constructor picked', picked);
+    this.setup(picked);
   }
 
-  #id;
-  get id(){ return this.#id; }
+  // reusable creator used by deserializer and constructor
+  setup(options){
 
-  #x = new Signal(0);
-  get x(){ return this.#x.value; }
-  set x(v){ this.#x.value = v; }
+    this.#signalStorage.id = new Signal(options.id??rid());
+    this.#signalStorage.type = new Signal(options.type);
+    this.#signalStorage.label = new Signal(options.label);
+    this.#signalStorage.x = new Signal(options.x);
+    this.#signalStorage.y = new Signal(options.y);
+    this.#signalStorage.r = new Signal(options.r);
+  }
 
-  #y = new Signal(0);
-  get y(){ return this.#y.value; }
-  set y(v){ this.#y.value = v; }
+  entries(){
+    return this.#serializable.map(key=>[key, this.get(key)])
+  }
 
-  #r = new Signal(1);
-  get r(){ return this.#r.value; }
-  set r(v){ this.#r.value = v; }
+  deserialize(data){
+    const picked = this.#pick(this.#acceptable, data);
+    this.setup(picked);
+  }
 
-  toObject(){
-    return {
-      id: this.id,
-      x: this.x,
-      y: this.y,
-      r: this.r,
-    }
+  serialize(){
+    const picked = this.#pick(this.#serializable, this);
+    return picked
+  }
+
+  // Ease Of Access
+
+  get id(){ return this.#signalStorage.id.value; } // hidden, unless asked
+
+  get type(){ return this.#signalStorage.type.value; }
+  set type(v){ this.#signalStorage.type.value = v; }
+
+  get x(){ return this.#signalStorage.x.value; }
+  set x(v){ this.#signalStorage.x.value = v; }
+
+  get y(){ return this.#signalStorage.y.value; }
+  set y(v){ this.#signalStorage.y.value = v; }
+
+  get r(){ return this.#signalStorage.r.value; }
+  set r(v){ this.#signalStorage.r.value = v; }
+
+  get label(){ return this.#signalStorage.label.value; }
+  set label(v){ this.#signalStorage.label.value = v; }
+
+  get signals(){ return this.#signalStorage; } // station5.signals access
+
+  get(name){
+    // if(!this.#signalStorage[name])
+    console.log('this.#signalStorage[name]', this.#signalStorage,name,this.#signalStorage[name])
+
+    return this.#signalStorage[name].value;
+  }
+
+  set(name, value){
+    this.#signalStorage[name].value = value;
+  }
+
+  // Subscription Tools
+
+  signal(name, subscriber){ // station6('x', fn)
+    return this.#signalStorage[name].subscribe(subscriber);
   }
 
   subscribe(subscriber){
-    return namedCombineLatest({ x:this.#x, y:this.#y, r:this.#r }).subscribe(subscriber);
+    return namedCombineLatest(this.#signalStorage).subscribe(subscriber);
   }
 
+  // Helper & Utility Functions
+  #pick(keys, data){
+    const entries = (data.entries?data.entries():Object.entries(data));
+    console.log('entries', entries)
+    const cleared = entries.filter(([k,v])=>keys.includes(k));
+    console.log('cleared', cleared)
+    return Object.fromEntries(cleared);
+  }
 
 }
 
@@ -61,11 +120,22 @@ export class StationManagerPlugin {
     this.app = app;
     this.svg = this.app.svg;
 
-    fromEvent(this.svg, 'worldclick')
+
+   //  Event Mediation & Semantic Lifting
+
+   // Recognize Clicks
+   fromEvent(this.svg, 'worldclick')
     .map(e=>({x:e.detail.worldX, y:e.detail.worldY}))
-    .log( v=> `AAAAA fricken click was heard!', ${JSON.stringify(v)}`)
-    // .subscribe( e=> this.app.emit('stationAdd', e) )
-    .subscribe(e=>this.stationAdd(e))
+    .log( v=> `Adding station: ${JSON.stringify(v)}`)
+    .subscribe(raw=>this.app.emit('stationAddRequest', raw))
+
+   // React to the addition
+   this.app.on('stationAddRequest', raw => this.stationAddRequest(raw) );
+   this.app.on('stationRemove', id => this.stationRemove(id) );
+   this.app.on('stationRestore', deserialized => this.stationRestore(deserialized) );
+
+   // this.app.emit('startRestore');
+
 
   }
 
@@ -79,11 +149,19 @@ export class StationManagerPlugin {
     this.app.emit(...argv);
   }
 
-  stationAdd(options) {
-    const station = new Station(options);
-    console.log('AAA', station.id, {...station});
+  stationAddRequest(raw) {
+    const station = new Station(raw);
     this.stationInstances.set(station.id, station);
-    this.eventDispatch('stationAdded', station.toObject());
+    this.eventDispatch('stationAdded', station);
+    return station;
+  }
+
+  stationRestore(options) {
+    console.log('stationRestore')
+
+    const station = new Station(options);
+    this.stationInstances.set(station.id, station);
+    this.eventDispatch('stationRestored', station);
     return station;
   }
 

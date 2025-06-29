@@ -24,12 +24,18 @@ class EventEmitter {
   }
 }
 
-export class StoredMap extends EventEmitter {
+export class PersistentMap extends EventEmitter {
   constructor(data = null, options = {}) {
     super();
 
     if (!options.prefix) {
       throw new Error('StoredMap requires a prefix option');
+    }
+    if (options.onRestored) {
+      this.on('restored', options.onRestored)
+    }
+    if (options.onLoaded) {
+      this.on('loaded', options.onLoaded)
     }
 
     this.prefix = options.prefix;
@@ -50,12 +56,15 @@ export class StoredMap extends EventEmitter {
         }
       }
     }
+      this.emit('loaded', this);
+
   }
 
   _loadKeys() {
     try {
       const keysJson = localStorage.getItem(this._keysKey);
       this._keys = keysJson ? new Set(JSON.parse(keysJson)) : new Set();
+      this.emit('restored', this);
     } catch (e) {
       this._keys = new Set();
     }

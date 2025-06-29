@@ -1,34 +1,67 @@
 body {
   margin: 0;
-  padding: 20px;
+  padding: 0;
   font-family: "Courier New", monospace;
   overflow: hidden;
   background-color: var(--background);
 }
 
-.container {
+
+
+/* TOOL MOdes*/
+
+svg[data-tool="pan-tool"]{
+    cursor: all-scroll;
+}
+svg[data-tool="select-tool"]{
+    cursor: grab;
+}
+svg[data-tool="connect-tool"]{
+  cursor: crosshair;
+}
+
+svg[data-tool="delete-tool"]{
+  cursor: no-drop;
+}
+svg[data-tool="zoom-in-tool"]{
+  cursor: zoom-in;
+}
+svg[data-tool="zoom-out-tool"]{
+  cursor: zoom-out;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+.ui-container {
   display: flex;
   flex-direction: column;
   height: 100vh;
 }
 
-.header {
-  padding: 10px 0;
-  margin-bottom: 20px;
+.text-info {
+  color: var(--violet) !important;
 }
 
-.controls {
+/* .controls {
   display: flex;
   gap: 10px;
-  margin-bottom: 10px;
 }
 
 .info {
   font-size: 12px;
-  color: #888;
+  color: var(--base02);
   display: flex;
   gap: 20px;
-}
+} */
 
 .svg-container {
   flex: 1;
@@ -99,17 +132,97 @@ input:focus, select:focus, textarea:focus {
   outline-offset: 1px;
 }
 
-/* Button */
-button {
+
+
+
+
+
+.snapped-top {
+  position: fixed;
+  top: 1rem;
+}
+.snapped-bottom {
+  position: fixed;
+  bottom: 1rem;
+}
+
+.snapped-start {
+  left: 1rem;
+}
+
+.snapped-center {
+  right: 1rem;
+  left: 1rem;
+}
+.snapped-end {
+  right: 1rem;
+}
+
+
+
+
+.toolbox {
   background: var(--base02);
   border: 1px solid var(--border);
-  padding: 8px 12px;
+  z-index: 1000;
+  display: inline-block;
+
+}
+
+.toolbox-vertical {
+
+}
+.toolbox-horizontal {
+
+}
+
+.toolbox-header {
+
+}
+
+.toolbox-title {
+
+}
+
+.toolbox-body {
+
+}
+
+
+/* Button */
+
+button.btn {
+  --my-btn-border-radius: 4px;
+  --my-btn-padding-x: 0.25rem;
+  --my-btn-padding-y: 0.50rem;
+  --my-btn-margin-x: 0.1rem;
+  --my-btn-margin-y: 0.0rem;
+}
+
+button.btn.btn-sm {
+  --my-btn-border-radius: 4px;
+  --my-btn-padding-x: 0.2rem;
+  --my-btn-padding-y: 0.30rem;
+  --my-btn-margin-x: 0.2rem;
+  --my-btn-margin-y: 0.0rem;
+}
+
+button.btn {
+
+  background: var(--base02);
+  border: 1px solid var(--border);
   cursor: pointer;
-  border-radius: 4px;
+
   font-family: inherit;
   color: var(--text);
   transition: background 0.2s;
+
+  border-radius: var(--my-btn-border-radius);
+  padding: var(--my-btn-padding-x) var(--my-btn-padding-y);
+  margin: var(--my-btn-margin-x) var(--my-btn-margin-y);
+
 }
+
 button:hover {
   background: var(--base03);
 }
