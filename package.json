@@ -1,13 +1,13 @@
 {
   "name": "pishposh",
   "type": "module",
-  "version": "1.0.11",
+  "version": "1.0.10",
   "description": "Visual Programming Language",
   "main": "index.js",
   "scripts": {
     "app": "nw .",
     "web": "http-server -p 8084 -c-1 .",
-    "save": "npm version patch; git add .; git commit -m 'Updated Release'; npm publish; git push;"
+    "save": "git add .; git commit -m 'Updated Release'; git push; npm version patch; npm publish;"
   },
   "keywords": [
     "visual-programming-language",
