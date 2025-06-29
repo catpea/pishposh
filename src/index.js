@@ -1,6 +1,7 @@
 // SubwayBuilder.js
 import { Application } from './Application.js';
 
+import { ToolboxPlugin } from './plug-ins/ui/ToolboxPlugin.js';
 import { DatabasePlugin } from './plug-ins/database/DatabasePlugin.js';
 import { WorkbenchPlugin } from './plug-ins/workbench/WorkbenchPlugin.js';
 
@@ -31,48 +32,31 @@ export class SubwayBuilder extends HTMLElement {
     connectedCallback() {
         this.innerHTML = `
 
-          <div class="ui-container">
+          <div id="ui-container" class="ui-container">
 
-                  <div class="toolbox snapped-top snapped-end rounded shadow" tabindex="-1" style="width: 15vw; min-height: 25vh;">
-                    <div class="toolbox-body p-3">
-                      <small class="text-info">properties</small>
-                    </div>
-                  </div>
-
-                  <div class="toolbox snapped-top snapped-start rounded shadow" tabindex="-1" style="width: 4.21rem;">
-                    <div class="toolbox-body p-1" style="columns: 2; gap: .5rem;">
-
-                        <button class="btn btn-sm" title="Reset View" onclick="app.emit('switchTool','select')"><i class="bi bi-arrows-move"></i></button>
-                        <button class="btn btn-sm" title="Reset View" onclick="app.emit('switchTool','connect')"><i class="bi bi-bezier2"></i></button>
-                        <button class="btn btn-sm" title="Reset View" onclick="app.emit('switchTool','delete')"><i class="bi bi-trash"></i></button>
-
-                        <button class="btn btn-sm" title="Reset View" onclick="app.plugins.get('WorkbenchPlugin').engine.resetZoom()"><i class="bi bi-search"></i></button>
-                        <button class="btn btn-sm" title="Zoom In" onclick="app.emit('switchTool','zoomin')"; app.plugins.get('WorkbenchPlugin').engine.zoomIn()"><i class="bi bi-zoom-in"></i></button>
-                        <button class="btn btn-sm" title="Zoom Out" onclick="app.emit('switchTool','zoomout')"; app.plugins.get('WorkbenchPlugin').engine.zoomOut()"><i class="bi bi-zoom-out"></i></button>
-                        <button class="btn btn-sm" title=""><i class="bi bi-lock"></i></button>
-                        <button class="btn btn-sm" title=""><i class="bi bi-floppy"></i></button>
-                    </div>
-                  </div>
-
-                  <div class="toolbox snapped-bottom snapped-center rounded" tabindex="-1" style="min-height: 3rem;">
-                    <div class="toolbox-body p-3">
-                      <small  class="text-info"id="pan-info">Pan: (0, 0)</small>
-                      <small  class="text-info"id="scale-info">Scale: 1.00</small>
-                      <small  class="text-info"id="mouse-info1">Mouse: (0, 0)</small>
-                      <small  class="text-info"id="mouse-info2">Mouse: (0, 0)</small>
-                    </div>
-                  </div>
-
-
-
-              <div class="svg-container">
-                  <svg id="main-svg">
-                      <defs>
-                      </defs>
-                      <g id="viewport">
-                      </g>
-                  </svg>
+            <div class="toolbox snapped-top snapped-end rounded shadow" tabindex="-1" style="width: 15vw; min-height: 25vh;">
+              <div class="toolbox-body p-3">
+                <small class="text-info">properties</small>
               </div>
+            </div>
+
+            <div class="toolbox snapped-bottom snapped-center rounded" tabindex="-1" style="min-height: 3rem;">
+              <div class="toolbox-body p-3">
+                <small  class="text-info"id="pan-info">Pan: (0, 0)</small>
+                <small  class="text-info"id="scale-info">Scale: 1.00</small>
+                <small  class="text-info"id="mouse-info1">Mouse: (0, 0)</small>
+                <small  class="text-info"id="mouse-info2">Mouse: (0, 0)</small>
+              </div>
+            </div>
+
+            <div class="svg-container">
+                <svg id="main-svg">
+                    <defs>
+                    </defs>
+                    <g id="viewport">
+                    </g>
+                </svg>
+            </div>
 
           </div>
         `;
@@ -82,6 +66,7 @@ export class SubwayBuilder extends HTMLElement {
         const app = new Application(svg);
 
         app.use(new WorkbenchPlugin());
+        app.use(new ToolboxPlugin());
 
         // Core plugins
         // app.use(new GridPlugin());

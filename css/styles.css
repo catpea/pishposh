@@ -9,13 +9,17 @@ body {
 
 
 /* TOOL MOdes*/
+svg[data-tool="select-tool"]{
+    cursor: default;
+}
+svg[data-tool="interact-tool"]{
+    cursor: pointer;
+}
 
-svg[data-tool="pan-tool"]{
+svg[data-tool="move-tool"]{
     cursor: all-scroll;
 }
-svg[data-tool="select-tool"]{
-    cursor: grab;
-}
+
 svg[data-tool="connect-tool"]{
   cursor: crosshair;
 }
@@ -225,4 +229,11 @@ button.btn {
 
 button:hover {
   background: var(--base03);
+}
+
+button.btn.active {
+  border: 1px solid var(--base1);
+
+  color: var(--base03);
+  background: var(--base01);
 }

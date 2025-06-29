@@ -3,9 +3,6 @@ import { ReactiveEmitter as EventEmitter,  ReactiveEventSourcingStream, Reactive
 import { Graph } from './core/Graph.js';
 import { getVisibleBounds } from './core/Utils.js';
 
-
-
-
 export class Application extends EventEmitter {
     constructor(svgElement) {
         super();
@@ -19,13 +16,7 @@ export class Application extends EventEmitter {
         this.zoom = 1;
         this.tileSize = 40;
 
-        this.tools = {
-          select:  {id:'select-tool'},
-          connect: {id:'connect-tool'},
-          delete:  {id:'delete-tool'},
-          zoomIn:  {id:'zoom-in-tool'},
-          zoomOut: {id:'zoom-out-tool'},
-        };
+        this.tools = {};
 
         this.layers = {
           grid: document.createElementNS('http://www.w3.org/2000/svg', 'g'),
@@ -47,17 +38,6 @@ export class Application extends EventEmitter {
         this.updateViewBox();
       });
 
-
-
-      this.on('switchTool', (toolId)=>{
-        const dataToolIdentity = this.tools[toolId].id;
-        if(!dataToolIdentity) console.error('No suck tool', toolId)
-        this.svg.setAttribute('data-tool', dataToolIdentity);
-      });
-
-      this.on('registerTool', (toolId, toolData)=>{
-        this.tools[toolId] = toolData;
-      });
 
 
 
