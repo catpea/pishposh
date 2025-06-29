@@ -20,11 +20,11 @@ export class Application extends EventEmitter {
         this.tileSize = 40;
 
         this.tools = {
-          select: 'select-tool',
-          connect: 'connect-tool',
-          delete: 'delete-tool',
-          zoomin: 'zoom-in-tool',
-          zoomout: 'zoom-out-tool',
+          select:  {id:'select-tool'},
+          connect: {id:'connect-tool'},
+          delete:  {id:'delete-tool'},
+          zoomIn:  {id:'zoom-in-tool'},
+          zoomOut: {id:'zoom-out-tool'},
         };
 
         this.layers = {
@@ -47,8 +47,16 @@ export class Application extends EventEmitter {
         this.updateViewBox();
       });
 
+
+
       this.on('switchTool', (toolId)=>{
-        this.svg.setAttribute('data-tool', this.tools[toolId])
+        const dataToolIdentity = this.tools[toolId].id;
+        if(!dataToolIdentity) console.error('No suck tool', toolId)
+        this.svg.setAttribute('data-tool', dataToolIdentity);
+      });
+
+      this.on('registerTool', (toolId, toolData)=>{
+        this.tools[toolId] = toolData;
       });
 
 
