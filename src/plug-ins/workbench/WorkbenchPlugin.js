@@ -1,5 +1,6 @@
 import { rid, ReactiveSignal as Signal, fromEvent, namedCombineLatest } from "../../core/Signal.js";
 import { PanZoomEngine } from "./PanZoomEngine.js";
+import { InteractionEvents } from './plug-ins/InteractionEvents.js';
 
 import { InteractionMousePlugin } from './plug-ins/InteractionMousePlugin.js';
 import { InteractionWheelPlugin } from './plug-ins/InteractionWheelPlugin.js';
@@ -31,6 +32,7 @@ export class WorkbenchPlugin {
 
     // CRITICAL: ResizeObserverPlugin Must be first!
     this.engine.use(new ResizeObserverPlugin());
+    this.engine.use(new InteractionEvents());
 
     // Add all interaction plugins
     this.engine
@@ -44,7 +46,7 @@ export class WorkbenchPlugin {
     const gridPlugin = new GridBackgroundPlugin({
       dotRadius: 0.5,
       gridSize: 20,
-      dotColor: 'var(--base01)',
+      dotColor: 'var(--base0)',
       minOpacity: 0.2,
       maxOpacity: 0.8,
       opacityThreshold: 0.7

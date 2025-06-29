@@ -1,6 +1,6 @@
 import { rid, ReactiveSignal as Signal, fromEvent, namedCombineLatest } from "../../core/Signal.js";
 
-export class StationCreationPlugin {
+export class StationVisualizationPlugin {
   app;
   stations;
   subscriptions;
@@ -14,19 +14,8 @@ export class StationCreationPlugin {
     this.app = app;
     this.svg = app.svg;
 
-    // const stationManager = app.plugins.get('StationManagerPlugin');
-    // const station = stationManager.createStation({x:10, y:11, r:12})
-    // station.subscribe(obj=>console.log('Station Data', obj))
+    this.app.on('stationAdded', station => this.renderStation(station) );
 
-    // this.svg.addEventListener("click", this.handleClick.bind(this));
-
-    // fromEvent(this.svg, 'worldclick')
-    // .map(e=>({x:e.detail.worldX, y:e.detail.worldY}))
-    // // .log( e=>console.log('AAAAA fricken click was heard!', JSON.stringify(e)) )
-    // .subscribe( e=> this.app.emit('stationAdd', e) )
-
-    // stationAdded
-    // stationRemoved
 
   }
 
@@ -38,6 +27,10 @@ export class StationCreationPlugin {
   eventDispatch(...argv){
     console.info('eventDispatch', ...argv);
     this.app.emit(...argv);
+  }
+
+  renderStation(station){
+    console.warn('RENDERING STATION!', station)
   }
 
 

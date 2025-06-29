@@ -17,6 +17,7 @@ export class GridBackgroundPlugin {
     // Internal state
     this.patternElement = null;
     this.backgroundRect = null;
+
     this.dotElement = null;
     this.defsElement = null;
 
@@ -43,6 +44,7 @@ export class GridBackgroundPlugin {
     this.engine.panX.subscribe(() => this.updateBackground());
     this.engine.panY.subscribe(() => this.updateBackground());
     this.engine.scale.subscribe(() => this.updateBackground());
+
     this.engine.worldPosX.subscribe(() => this.updateBackground());
     this.engine.worldPosY.subscribe(() => this.updateBackground());
 

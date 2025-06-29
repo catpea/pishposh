@@ -1,9 +1,9 @@
-import { rid, ReactiveSignal as Signal, namedCombineLatest } from "../../core/Signal.js";
+import { rid, ReactiveSignal as Signal, namedCombineLatest, fromEvent } from "../../core/Signal.js";
 
 class Station {
 
-  constructor({ id, x, y, r }) {
-    this.#id = id ?? rid();
+  constructor({ id, x, y, r=32 }) {
+    this.#id = id || rid();
 
     // Warn if x, y, or r is missing
     if (x === undefined || y === undefined || r === undefined) {
@@ -13,10 +13,11 @@ class Station {
     this.x = x;
     this.y = y;
     this.r = r;
+
   }
 
   #id;
-  get id(){ this.#id.value; }
+  get id(){ return this.#id; }
 
   #x = new Signal(0);
   get x(){ return this.#x.value; }
@@ -30,6 +31,15 @@ class Station {
   get r(){ return this.#r.value; }
   set r(v){ this.#r.value = v; }
 
+  toObject(){
+    return {
+      id: this.id,
+      x: this.x,
+      y: this.y,
+      r: this.r,
+    }
+  }
+
   subscribe(subscriber){
     return namedCombineLatest({ x:this.#x, y:this.#y, r:this.#r }).subscribe(subscriber);
   }
@@ -39,16 +49,24 @@ class Station {
 
 export class StationManagerPlugin {
   app;
-  stations;
+  stationInstances;
   subscriptions;
 
   constructor() {
     this.subscriptions = new Set();
-    this.stations = new Map();
+    this.stationInstances = new Map();
   }
 
   init(app) {
     this.app = app;
+    this.svg = this.app.svg;
+
+    fromEvent(this.svg, 'worldclick')
+    .map(e=>({x:e.detail.worldX, y:e.detail.worldY}))
+    .log( v=> `AAAAA fricken click was heard!', ${JSON.stringify(v)}`)
+    // .subscribe( e=> this.app.emit('stationAdd', e) )
+    .subscribe(e=>this.stationAdd(e))
+
   }
 
   stop() {
@@ -61,23 +79,24 @@ export class StationManagerPlugin {
     this.app.emit(...argv);
   }
 
-  createStation(options) {
+  stationAdd(options) {
     const station = new Station(options);
-    this.stations.set(station.id, station);
-    this.eventDispatch('stationCreated', station);
+    console.log('AAA', station.id, {...station});
+    this.stationInstances.set(station.id, station);
+    this.eventDispatch('stationAdded', station.toObject());
     return station;
   }
 
-  removeStation(id) {
+  stationRemove(id) {
     if (!id) return console.warn("Attempted to remove a station without an id.");
-    if (!this.stations.has(id)) return console.warn(`No station found with id: ${id}`);
-    this.stations.delete(id);
+    if (!this.stationInstances.has(id)) return console.warn(`No station found with id: ${id}`);
+    this.stationInstances.delete(id);
     this.eventDispatch('stationRemoved', id);
   }
 
   getStation(id) {
     if (!id) throw new Error("Station id is required to retrieve a station.");
-    const station = this.stations.get(id);
+    const station = this.stationInstances.get(id);
     if (!station) throw new Error(`No station found with id: ${id}`);
     return station;
   }

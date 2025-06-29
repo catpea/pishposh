@@ -1,6 +1,7 @@
 // SubwayBuilder.js
 import { Application } from './Application.js';
 
+import { DatabasePlugin } from './plug-ins/database/DatabasePlugin.js';
 import { WorkbenchPlugin } from './plug-ins/workbench/WorkbenchPlugin.js';
 
 // import { GridPlugin } from './plug-ins/GridPlugin.js';
@@ -10,7 +11,7 @@ import { WorkbenchPlugin } from './plug-ins/workbench/WorkbenchPlugin.js';
 // import { PanZoomPlugin } from './plug-ins/pan-zoom/PanZoomPlugin.js';
 
 import { StationManagerPlugin } from './plug-ins/station/StationManagerPlugin.js';
-import { StationCreationPlugin } from './plug-ins/station/StationCreationPlugin.js';
+import { StationVisualizationPlugin } from './plug-ins/station/StationVisualizationPlugin.js';
 
 // import { StationPlugin } from './plug-ins/StationPlugin.js';
 // import { ConnectPlugin } from './plug-ins/ConnectPlugin.js';
@@ -32,35 +33,46 @@ export class SubwayBuilder extends HTMLElement {
 
           <div class="container">
               <div class="header">
+
                   <div class="controls">
                       <button title="Reset View" onclick="app.plugins.get('WorkbenchPlugin').engine.resetZoom()"><i class="bi bi-search"></i></button>
                       <button title="Zoom In" onclick="app.plugins.get('WorkbenchPlugin').engine.zoomIn()"><i class="bi bi-zoom-in"></i></button>
                       <button title="Zoom Out" onclick="app.plugins.get('WorkbenchPlugin').engine.zoomOut()"><i class="bi bi-zoom-out"></i></button>
-                      <button title="Toggle Grid" onclick="app.plugins.get('WorkbenchPlugin').engine.toggleGrid()"></button>
+                      <i class="bi bi-three-dots-vertical" style="align-content: center; color: var(--base01);"></i>
+                      <button title=""><i class="bi bi-lock"></i></button>
+                      <button title=""><i class="bi bi-floppy"></i></button>
                   </div>
+
                   <div class="info">
                       <span id="pan-info">Pan: (0, 0)</span>
                       <span id="scale-info">Scale: 1.00</span>
                       <span id="mouse-info1">Mouse: (0, 0)</span>
                       <span id="mouse-info2">Mouse: (0, 0)</span>
                   </div>
+
               </div>
 
               <div class="svg-container">
-                  <svg id="main-svg" viewBox="0 0 800 600">
+                  <svg id="main-svg">
+
                       <defs>
                       </defs>
 
                       <g id="viewport">
 
+                          <g id="groups-layer"></g>
                           <g id="connections-layer"></g>
                           <g id="stations-layer"></g>
                           <g id="labels-layer"></g>
                           <g id="temp-layer"></g>
 
                           <!-- Content area for geometry testing -->
-                          <g id="content"></g>
+                          <g id="content">
+
+                          </g>
+
                       </g>
+
                   </svg>
               </div>
           </div>
@@ -70,6 +82,7 @@ export class SubwayBuilder extends HTMLElement {
         const svg = this.querySelector('#main-svg');
         const app = new Application(svg);
 
+        app.use(new DatabasePlugin());
         app.use(new WorkbenchPlugin());
 
         // Core plugins
@@ -79,7 +92,7 @@ export class SubwayBuilder extends HTMLElement {
 
         // Station System
         app.use(new StationManagerPlugin());
-        app.use(new StationCreationPlugin());
+        app.use(new StationVisualizationPlugin());
 
         // app.use(new StationPlugin());
         // app.use(new ConnectPlugin());

@@ -126,6 +126,10 @@ export class ReactiveEmitter extends StreamEmitter {
     return merge(this, ...argv);
   }
 
+  log(...argv) {
+    return log(this, ...argv);
+  }
+
 }
 
 export class Signal {
@@ -220,6 +224,10 @@ export class ReactiveSignal extends Signal {
 
   merge(...argv) {
     return merge(this, ...argv);
+  }
+
+  log(...argv) {
+    return log(this, ...argv);
   }
 
 }
@@ -363,6 +371,19 @@ export function withLatestFrom(source, other) {
   return result;
 }
 
+export function log(source, fn) {
+  const result = new ReactiveEmitter();
+  result.name = "log";
+  result.source = source;
+
+  source.subscribe((value) => {
+    console.log( fn(value));
+    result.emitValue(value);
+  });
+
+  return result;
+}
+
 export function merge(...emitters) {
   const result = new ReactiveEmitter();
   result.name = "merge";
@@ -395,10 +416,13 @@ export function fromEvent(source, eventName) {
 
   // Create a function to handle the event
   const eventHandler = (value) => {
+    console.log('eventName', value)
     result.emitValue(value);
   };
 
   // Check if the source is a DOM element or an event emitter
+  console.log('source instanceof EventTarget', eventName, source instanceof EventTarget)
+
   if (source instanceof EventTarget) {
     // For DOM events
     source.addEventListener(eventName, eventHandler);
@@ -407,6 +431,7 @@ export function fromEvent(source, eventName) {
     result.unsubscribe.add(() => {
       source.removeEventListener(eventName, eventHandler);
     });
+
   } else {
     // For other event emitters
     source.on(eventName, eventHandler);

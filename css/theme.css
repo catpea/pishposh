@@ -1,15 +1,22 @@
 /* Solarized Dark Theme Base */
 :root {
+
+  /* Dark Background */
   --base03:    #002b36; /* background */
   --base02:    #073642; /* background highlights */
 
-  --base01:    #586e75; /* comments / secondary content */
-  --base00:    #657b83;
+  /* Light Background */
+  --base2:     #eee8d5; /* light bg (avoid) */
+  --base3:     #fdf6e3;
+
+  /* Primary Text */
   --base0:     #839496; /* body text / primary content */
   --base1:     #93a1a1;
 
-  --base2:     #eee8d5; /* light bg (avoid) */
-  --base3:     #fdf6e3;
+  /* Secondary Text */
+  --base01:    #586e75; /* comments / secondary content */
+  --base00:    #657b83;
+
 
   /* Warning */
   --green:     #859900;
