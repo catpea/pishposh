@@ -1,7 +1,7 @@
 {
   "name": "pishposh",
   "type": "module",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "description": "Visual Programming Language",
   "main": "index.js",
   "scripts": {
