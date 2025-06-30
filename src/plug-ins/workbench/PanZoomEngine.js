@@ -5,7 +5,8 @@ export class PanZoomEngine {
 
   debug = false;
 
-  constructor(svgElement) {
+  constructor(app, svgElement) {
+    this.app = app;
 
     this.svg = svgElement;
     this.viewport = svgElement.querySelector("#viewport");
@@ -21,8 +22,16 @@ export class PanZoomEngine {
     this.panY = new Signal(0);
     this.scale = new Signal(1);
 
+    this.tileSize = 40;
+
+
     // Plugin system
     this.plugins = [];
+
+    this.isActive = true;
+    this.activatingToolName = 'panZoom';
+    this.app.selectedTool.subscribe(selectedToolName=>this.isActive=selectedToolName==this.activatingToolName);
+
     this.isRunning = false;
 
     // Subscribe to signal changes
@@ -201,4 +210,15 @@ export class PanZoomEngine {
   clamp(value, min, max) {
     return Math.max(min, Math.min(max, value));
   }
+
+
+
+
+    snapToGrid(x, y) {
+          return {
+              x: Math.round(x / this.tileSize) * this.tileSize,
+              y: Math.round(y / this.tileSize) * this.tileSize
+          };
+      }
+
 }

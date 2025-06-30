@@ -16,7 +16,7 @@ svg[data-tool="interact-tool"]{
     cursor: pointer;
 }
 
-svg[data-tool="move-tool"]{
+svg[data-tool="pan-zoom-tool"]{
     cursor: all-scroll;
 }
 

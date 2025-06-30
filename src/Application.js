@@ -14,7 +14,6 @@ export class Application extends EventEmitter {
         this.svg = svgElement;
         this.viewBox = { x: 0, y: 0, width: 1200, height: 800 };
         this.zoom = 1;
-        this.tileSize = 40;
 
         this.tools = {};
 
@@ -54,49 +53,55 @@ export class Application extends EventEmitter {
     }
 
     use(plugin) {
+
         plugin.init(this);
-        this.plugins.set(plugin.constructor.name, plugin);
+
+        // Store the plugin in plugins set for easy lookup.
+        /*
+        Example:
+          this.somePlugin = app.plugins.get('SomePlugin');
+          this.somePlugin.poke()
+        */
+        const pluginName = plugin.constructor.name;
+        this.plugins.set(pluginName, plugin);
+
+
     }
 
     updateViewBox() {
         this.svg.setAttribute('viewBox', `${this.viewBox.x} ${this.viewBox.y} ${this.viewBox.width} ${this.viewBox.height}`);
     }
 
-    getMousePosition(e) {
-        const rect = this.svg.getBoundingClientRect();
-        const viewBox = this.svg.viewBox.baseVal;
+    // getMousePosition(e) {
+    //     const rect = this.svg.getBoundingClientRect();
+    //     const viewBox = this.svg.viewBox.baseVal;
 
-        // Calculate aspect ratios
-        const viewportAspect = rect.width / rect.height;
-        const viewBoxAspect = viewBox.width / viewBox.height;
+    //     // Calculate aspect ratios
+    //     const viewportAspect = rect.width / rect.height;
+    //     const viewBoxAspect = viewBox.width / viewBox.height;
 
-        let scaleX, scaleY, offsetX = 0, offsetY = 0;
+    //     let scaleX, scaleY, offsetX = 0, offsetY = 0;
 
-        if (viewportAspect > viewBoxAspect) {
-            // Viewport is wider - letterboxing on sides
-            scaleY = viewBox.height / rect.height;
-            scaleX = scaleY;
-            const scaledWidth = viewBox.width / scaleX;
-            offsetX = (rect.width - scaledWidth) / 2;
-        } else {
-            // Viewport is taller - letterboxing on top/bottom
-            scaleX = viewBox.width / rect.width;
-            scaleY = scaleX;
-            const scaledHeight = viewBox.height / scaleY;
-            offsetY = (rect.height - scaledHeight) / 2;
-        }
+    //     if (viewportAspect > viewBoxAspect) {
+    //         // Viewport is wider - letterboxing on sides
+    //         scaleY = viewBox.height / rect.height;
+    //         scaleX = scaleY;
+    //         const scaledWidth = viewBox.width / scaleX;
+    //         offsetX = (rect.width - scaledWidth) / 2;
+    //     } else {
+    //         // Viewport is taller - letterboxing on top/bottom
+    //         scaleX = viewBox.width / rect.width;
+    //         scaleY = scaleX;
+    //         const scaledHeight = viewBox.height / scaleY;
+    //         offsetY = (rect.height - scaledHeight) / 2;
+    //     }
 
-        // Convert client coordinates to SVG coordinates
-        const x = (e.clientX - rect.left - offsetX) * scaleX + viewBox.x;
-        const y = (e.clientY - rect.top - offsetY) * scaleY + viewBox.y;
+    //     // Convert client coordinates to SVG coordinates
+    //     const x = (e.clientX - rect.left - offsetX) * scaleX + viewBox.x;
+    //     const y = (e.clientY - rect.top - offsetY) * scaleY + viewBox.y;
 
-        return { x, y };
-    }
-    snapToGrid(x, y) {
-          return {
-              x: Math.round(x / this.tileSize) * this.tileSize,
-              y: Math.round(y / this.tileSize) * this.tileSize
-          };
-      }
+    //     return { x, y };
+    // }
+
 
 }

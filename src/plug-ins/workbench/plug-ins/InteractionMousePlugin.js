@@ -1,5 +1,6 @@
 // Mouse interaction plugin
 export class InteractionMousePlugin {
+
   constructor() {
     this.isDragging = false;
     this.lastX = 0;
@@ -20,6 +21,8 @@ export class InteractionMousePlugin {
   }
 
   onMouseDown = (event) => {
+    if(!this.engine.isActive) return;
+
     event.preventDefault();
     this.isDragging = true;
     this.lastX = event.clientX;

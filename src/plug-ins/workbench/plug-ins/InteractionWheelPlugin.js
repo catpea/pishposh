@@ -14,6 +14,7 @@ export class InteractionWheelPlugin {
   }
 
   onWheel = (event) => {
+    if(!this.engine.isActive) return;
     event.preventDefault();
     const scaleFactor = this.engine.calculateWheelDelta(event);
     this.engine.zoomAtBy(scaleFactor, event.clientX, event.clientY);

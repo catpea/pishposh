@@ -1,0 +1,12 @@
+.station {
+  cursor: pointer;
+}
+.station-circle {
+  fill: var(--base03);
+  stroke: var(--text);
+  stroke-width: 3;
+}
+.station-circle.selected {
+  fill: var(--primary);
+  stroke: var(--blue);
+}

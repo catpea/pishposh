@@ -11,8 +11,13 @@ import { WorkbenchPlugin } from './plug-ins/workbench/WorkbenchPlugin.js';
 // // v1: import { PanZoomPlugin } from './plug-ins/PanZoomPlugin.js';
 // import { PanZoomPlugin } from './plug-ins/pan-zoom/PanZoomPlugin.js';
 
+import { ConnectionManagerPlugin } from './plug-ins/connection/ConnectionManagerPlugin.js';
+
 import { StationManagerPlugin } from './plug-ins/station/StationManagerPlugin.js';
-import { StationVisualizationPlugin } from './plug-ins/station/StationVisualizationPlugin.js';
+import { StationRenderPlugin } from './plug-ins/station/StationRenderPlugin.js';
+import { StationMovePlugin } from './plug-ins/station/StationMovePlugin.js';
+import { StationDeletePlugin } from './plug-ins/station/StationDeletePlugin.js';
+import { StationCreatePlugin } from './plug-ins/station/StationCreatePlugin.js';
 
 // import { StationPlugin } from './plug-ins/StationPlugin.js';
 // import { ConnectPlugin } from './plug-ins/ConnectPlugin.js';
@@ -42,10 +47,11 @@ export class SubwayBuilder extends HTMLElement {
 
             <div class="toolbox snapped-bottom snapped-center rounded" tabindex="-1" style="min-height: 3rem;">
               <div class="toolbox-body p-3">
-                <small  class="text-info"id="pan-info">Pan: (0, 0)</small>
-                <small  class="text-info"id="scale-info">Scale: 1.00</small>
-                <small  class="text-info"id="mouse-info1">Mouse: (0, 0)</small>
-                <small  class="text-info"id="mouse-info2">Mouse: (0, 0)</small>
+                <small class="text-info" id="tool-info">Tool: (?)</small>
+                <small class="text-info" id="pan-info">Pan: (0, 0)</small>
+                <small class="text-info" id="scale-info">Scale: 1.00</small>
+                <small class="text-info" id="mouse-info1">Mouse: (0, 0)</small>
+                <small class="text-info" id="mouse-info2">Mouse: (0, 0)</small>
               </div>
             </div>
 
@@ -65,17 +71,25 @@ export class SubwayBuilder extends HTMLElement {
         const svg = this.querySelector('#main-svg');
         const app = new Application(svg);
 
-        app.use(new WorkbenchPlugin());
         app.use(new ToolboxPlugin());
+        app.use(new WorkbenchPlugin());
 
         // Core plugins
         // app.use(new GridPlugin());
         // app.use(new ToolboxPlugin());
         // app.use(new PanZoomPlugin());
 
+
+
         // Station System
-        app.use(new StationVisualizationPlugin());
         app.use(new StationManagerPlugin());
+        app.use(new StationRenderPlugin());
+        app.use(new StationMovePlugin());
+        app.use(new StationDeletePlugin());
+        app.use(new StationCreatePlugin());
+
+        // Connection System
+        app.use(new ConnectionManagerPlugin());
 
         // app.use(new StationPlugin());
         // app.use(new ConnectPlugin());
@@ -90,6 +104,7 @@ export class SubwayBuilder extends HTMLElement {
         app.use(new DatabasePlugin());
 
         app.init();
+
         window.app = app; // Debug access
 
 

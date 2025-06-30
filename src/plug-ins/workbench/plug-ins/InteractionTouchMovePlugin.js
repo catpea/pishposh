@@ -21,6 +21,7 @@ export class InteractionTouchMovePlugin {
   }
 
   onTouchStart = (event) => {
+    if(!this.engine.isActive) return;
     if (event.touches.length === 1) {
       event.preventDefault();
       this.isTouching = true;

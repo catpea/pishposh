@@ -1,6 +1,6 @@
 import { rid, ReactiveSignal as Signal, fromEvent, namedCombineLatest } from "../../core/Signal.js";
 
-export class StationVisualizationPlugin {
+export class StationRenderPlugin {
   app;
   stations;
   subscriptions;
@@ -16,7 +16,9 @@ export class StationVisualizationPlugin {
 
     this.app.on('stationAdded', station => this.renderStation(station) );
     this.app.on('stationRestored', station => this.renderStation(station) );
+    this.app.on('stationRemoved', id => this.removeStation(id));
 
+   this.app.emit('registerTool', {name:'move',  data:{id:'move-tool',  icon:'bi-arrows-move', iconSelected:'bi-arrows-move', description:'move items' }});
 
 
   }
@@ -46,9 +48,11 @@ export class StationVisualizationPlugin {
   }
 
 
-  renderStation( station ) {
+  removeStation( id ) {
+    this.app.layers.stations.querySelector(`g.station[data-station-id='${id}']`).remove();
+  }
 
-    console.info('Creating', station.serialize())
+  renderStation( station ) {
 
     const group = document.createElementNS("http://www.w3.org/2000/svg", "g");
     group.setAttribute("class", "station");
@@ -91,7 +95,7 @@ export class StationVisualizationPlugin {
     circle.setAttribute("cx", station.x);
     circle.setAttribute("cy", station.y);
     circle.setAttribute("r", station.r);
-    circle.addEventListener("click",()=>this.app.emit("selectNode",station));
+    circle.addEventListener("click",()=> this.eventDispatch("selectNode", station) );
     group.appendChild(circle);
 
     this.listenTo(station, 'x', (x) => {

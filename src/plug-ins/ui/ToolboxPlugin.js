@@ -9,6 +9,7 @@ export class ToolboxPlugin {
   subscriptions;
 
   constructor() {
+    this.defaultTool = 'select';
     this.subscriptions = new Set();
   }
 
@@ -29,10 +30,10 @@ export class ToolboxPlugin {
     this.toolListElement = divElement.querySelector('#tool-list-toolbox');
 
     if(!this.app.tools) this.app.tools = {};
-    if(!this.app.selectedTool) this.app.selectedTool = new Signal('select');
-    this.app.selectedTool.subscribe(selectedName=>{
-        console.log('AAA this.app.selectedTool.subscribe', selectedName )
+    if(!this.app.selectedTool) this.app.selectedTool = new Signal(this.defaultTool);
 
+    this.app.selectedTool.subscribe(selectedName=>{
+      document.getElementById("tool-info").textContent = `Tool: (${selectedName})`;
     });
 
     this.app.on('registerTool', ({name: toolName, data: toolData})=>{
@@ -41,7 +42,7 @@ export class ToolboxPlugin {
 
       const toolButton = document.createElement("button");
       toolButton.classList.add('btn', 'btn-sm');
-      toolButton.setAttribute('title', 'Reset View');
+      toolButton.setAttribute('title', toolData.description);
       toolButton.addEventListener('click', ()=>this.eventDispatch('selectTool', toolName))
 
       const toolIcon = document.createElement("i");
@@ -81,16 +82,18 @@ export class ToolboxPlugin {
 
     });
 
-    this.app.emit('registerTool', {name:'select',   data:{id:'select-tool',  icon:'bi-cursor',  iconSelected:'bi-cursor-fill' }});
-    this.app.emit('registerTool', {name:'move',     data:{id:'move-tool',  icon:'bi-arrows-move',  iconSelected:'bi-recycle' }});
-    this.app.emit('registerTool', {name:'connect',  data:{id:'connect-tool', icon:'bi-diagram-2', iconSelected:'bi-diagram-3-fill' }});
-    this.app.emit('registerTool', {name:'delete',   data:{id:'delete-tool',  icon:'bi-trash',   iconSelected:'bi-trash-fill' }});
-    this.app.emit('registerTool', {name:'interact', data:{id:'interact-tool',  icon:'bi-hand-index-thumb',   iconSelected:'bi-hand-index-fill' }});
-    this.app.emit('registerTool', {name:'comment',  data:{id:'interact-tool',  icon:'bi-pin-angle',   iconSelected:'bi-pin-fill' }});
+    this.app.emit('registerTool', {name:'select',   data:{id:'select-tool',   icon:'bi-cursor', iconSelected:'bi-cursor-fill', description:'select item' }});
+    this.app.emit('registerTool', {name:'group',   data:{id:'group-tool',   icon:'bi-pentagon', iconSelected:'bi-pentagon-fill', description:'group items' }});
+
+
+    this.app.emit('registerTool', {name:'connect',  data:{id:'connect-tool',  icon:'bi-share', iconSelected:'bi-share-fill', description:'connect items' }});
+    // this.app.emit('registerTool', {name:'interact', data:{id:'interact-tool', icon:'bi-hand-index-thumb', iconSelected:'bi-hand-index-fill', description:'interact with item' }});
+    // this.app.emit('registerTool', {name:'comment',  data:{id:'interact-tool', icon:'bi-pin-angle', iconSelected:'bi-pin-fill', description:'comment tool' }});
+
+    ///...
     // this.app.emit('registerTool', {name:'zoomIn',  data:{id:'zoom-in-tool'}});
     // this.app.emit('registerTool', {name:'zoomOut', data:{id:'zoom-out-tool'}});
 
-    this.app.emit('selectTool', 'select');
 
   }
 

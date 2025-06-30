@@ -610,52 +610,6 @@ export class ReactiveEventSourcingStream extends EventSourcingStream {
 
 }
 
-
-// Usage Examples:
-
-/*
-// Basic usage with event sourcing
-const emitter = new EventSourcing({
-  snapshotInterval: 50,
-  maxLogSize: 1000,
-  persistence: new EventSourcingMemoryPersistence()
-});
-
-// Listen to events
-emitter.on('user.created', (data, event) => {
-  console.log('User created:', data.name, 'at', event.timestamp);
-});
-
-// Emit events with metadata
-emitter.emit('user.created',
-  { id: 1, name: 'John' },
-  { metadata: { source: 'api', userId: 'admin' } }
-);
-
-// Query events
-const userEvents = emitter.getEvents({
-  event: 'user.created',
-  fromTimestamp: '2023-01-01'
-});
-
-// Create projections
-const userProjection = emitter.project((state, event) => {
-  if (event.event === 'user.created') {
-    state.users = state.users || [];
-    state.users.push(event.data);
-  }
-  return state;
-});
-
-// Create snapshots
-emitter.createSnapshot({ customData: 'state' });
-
-// Replay events
-emitter.replay(0, 100); // Replay events 0-100
-
-// Get statistics
-console.log(emitter.getStats());
-*/
 export class EventEmitter {
   eventNames;
 
@@ -1085,7 +1039,7 @@ export function fromEvent(source, eventName) {
   };
 
   // Check if the source is a DOM element or an event emitter
-  console.log('source instanceof EventTarget', eventName, source instanceof EventTarget)
+  // console.log('source instanceof EventTarget', eventName, source instanceof EventTarget)
 
   if (source instanceof EventTarget) {
     // For DOM events
@@ -1113,7 +1067,7 @@ export function fromEvent(source, eventName) {
 
 
 export function namedCombineLatest(namedSignals) {
-  console.log({namedSignals})
+  // console.log({namedSignals})
   const result = new ReactiveEmitter();
   result.replayLast = true;
   result.name = "watchNamed";
@@ -1133,7 +1087,7 @@ export function namedCombineLatest(namedSignals) {
       hasValue[index] = true;
 
       // Check if all emitters have emitted at least once
-      console.log('ZZZ hasValue.every(Boolean)', hasValue.every(Boolean), hasValue)
+      //console.log('ZZZ hasValue.every(Boolean)', hasValue.every(Boolean), hasValue)
       if (hasValue.every(Boolean)) {
 
         const entries = new Array(signalNames.length);
@@ -1141,7 +1095,7 @@ export function namedCombineLatest(namedSignals) {
           entries[index] = [name, values[index]];
         }
         const obj = Object.fromEntries(entries)
-        console.log('ZZZ REESDY>', obj)
+        //console.log('ZZZ REESDY>', obj)
         result.emitValue(obj); // Emit an array of values
       }
     }); // subscribe to emitter

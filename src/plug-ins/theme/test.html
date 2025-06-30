@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Color Functions Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .header h1 {
+            font-size: 3em;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #f9ca24);
+            background-size: 400% 400%;
+            animation: gradientShift 3s ease infinite;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 15px;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .control-group {
+            background: rgba(255, 255, 255, 0.08);
+            padding: 25px;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+        }
+
+        .control-group h3 {
+            color: #4ecdc4;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+
+        .color-input-container {
+            position: relative;
+            margin-bottom: 15px;
+        }
+
+        .color-input {
+            width: 100%;
+            height: 50px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            outline: none;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            transition: transform 0.2s ease;
+        }
+
+        .color-input:hover {
+            transform: scale(1.05);
+        }
+
+        .color-value {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+            pointer-events: none;
+            font-size: 14px;
+        }
+
+        select, input[type="range"] {
+            width: 100%;
+            padding: 12px;
+            margin: 5px 0;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 14px;
+        }
+
+        select option {
+            background: #1a1a2e;
+            color: white;
+        }
+
+        input[type="range"] {
+            height: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            outline: none;
+            padding: 0;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #4ecdc4;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(78, 205, 196, 0.3);
+        }
+
+        .swatch-container {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .swatch-title {
+            text-align: center;
+            font-size: 1.5em;
+            margin-bottom: 25px;
+            color: #4ecdc4;
+        }
+
+        .swatch-strip {
+            display: flex;
+            height: 120px;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            margin-bottom: 20px;
+            transition: transform 0.3s ease;
+        }
+
+        .swatch-strip:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .swatch-color {
+            flex: 1;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .swatch-color:hover {
+            transform: scaleY(1.1);
+            z-index: 10;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+        }
+
+        .color-hex {
+            font-size: 11px;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+
+        .swatch-color:hover .color-hex {
+            opacity: 1;
+        }
+
+        .effect-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        .effect-demo {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 15px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .effect-demo:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .effect-title {
+            color: #f9ca24;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+
+        .mini-swatch {
+            height: 60px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .mini-swatch:hover {
+            transform: scale(1.05);
+        }
+
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(78, 205, 196, 0.9);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            transform: translateX(300px);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .toast.show {
+            transform: translateX(0);
+        }
+
+        .animate-btn {
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            margin: 10px 5px;
+        }
+
+        .animate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 107, 107, 0.3);
+        }
+
+        .param-display {
+            font-size: 12px;
+            color: #cccccc;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Color Functions Demo</h1>
+            <p>Explore nature-inspired and sci-fi color transformations</p>
+        </div>
+
+        <div class="controls">
+            <div class="control-group">
+                <h3>Base Color</h3>
+                <div class="color-input-container">
+                    <input type="color" id="baseColor" class="color-input" value="#ff6b6b">
+                    <div class="color-value" id="baseColorValue">#ff6b6b</div>
+                </div>
+                <button class="animate-btn" onclick="randomizeColor()">Random Base</button>
+            </div>
+
+            <div class="control-group">
+                <h3>Primary Effect</h3>
+                <select id="primaryEffect">
+                    <option value="iridescence">Iridescence</option>
+                    <option value="atmosphericScatter">Atmospheric Scatter</option>
+                    <option value="sunsetGradient">Sunset Gradient</option>
+                    <option value="bioluminescence">Bioluminescence</option>
+                    <option value="underwaterCaustics">Underwater Caustics</option>
+                    <option value="auroraTransform">Aurora Transform</option>
+                    <option value="xenCrystal">Xen Crystal</option>
+                    <option value="gravityGun">Gravity Gun</option>
+                    <option value="oilSlick">Oil Slick</option>
+                    <option value="chromaticAberration">Chromatic Aberration</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <h3>Intensity</h3>
+                <input type="range" id="intensity" min="0" max="1" step="0.1" value="0.5">
+                <div class="param-display">Value: <span id="intensityValue">0.5</span></div>
+            </div>
+
+            <div class="control-group">
+                <h3>Animation</h3>
+                <button class="animate-btn" id="animateBtn" onclick="toggleAnimation()">Start Animation</button>
+                <button class="animate-btn" onclick="generateNewSwatch()">New Swatch</button>
+            </div>
+        </div>
+
+        <div class="swatch-container">
+            <div class="swatch-title">Color Transformation Strip</div>
+            <div class="swatch-strip" id="mainSwatch"></div>
+            <p style="text-align: center; color: #cccccc; font-size: 14px; margin-top: 15px;">
+                Click any color to copy its hex value to clipboard
+            </p>
+        </div>
+
+        <div class="effect-grid" id="effectGrid"></div>
+    </div>
+
+    <div class="toast" id="toast">Color copied to clipboard!</div>
+
+    <script>
+        // Include the ColorFunctions class
+        class ColorFunctions {
+            constructor() {
+                this.time = 0;
+                this.animationId = null;
+                this.startTime = Date.now();
+            }
+
+            static clamp(value, min = 0, max = 255) {
+                return Math.max(min, Math.min(max, value));
+            }
+
+            static hslToRgb(h, s, l) {
+                h /= 360;
+                s /= 100;
+                l /= 100;
+
+                const hue2rgb = (p, q, t) => {
+                    if (t < 0) t += 1;
+                    if (t > 1) t -= 1;
+                    if (t < 1/6) return p + (q - p) * 6 * t;
+                    if (t < 1/2) return q;
+                    if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+                    return p;
+                };
+
+                const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+                const p = 2 * l - q;
+
+                return {
+                    r: Math.round(hue2rgb(p, q, h + 1/3) * 255),
+                    g: Math.round(hue2rgb(p, q, h) * 255),
+                    b: Math.round(hue2rgb(p, q, h - 1/3) * 255)
+                };
+            }
+
+            updateTime() {
+                this.time = (Date.now() - this.startTime) * 0.001;
+            }
+
+            atmosphericScatter(baseColor, scatterAmount = 0.3) {
+                const r = baseColor.r * (1 - scatterAmount * 0.8);
+                const g = baseColor.g * (1 - scatterAmount * 0.6);
+                const b = baseColor.b * (1 - scatterAmount * 0.2);
+                return {
+                    r: ColorFunctions.clamp(r),
+                    g: ColorFunctions.clamp(g),
+                    b: ColorFunctions.clamp(b)
+                };
+            }
+
+            sunsetGradient(baseColor, elevation = 0.5) {
+                const sunsetFactor = Math.sin(elevation * Math.PI);
+                const orangeShift = sunsetFactor * 0.8;
+                const redShift = sunsetFactor * 0.6;
+
+                return {
+                    r: ColorFunctions.clamp(baseColor.r + orangeShift * 100 + redShift * 50),
+                    g: ColorFunctions.clamp(baseColor.g + orangeShift * 60 - redShift * 30),
+                    b: ColorFunctions.clamp(baseColor.b - orangeShift * 80 - redShift * 100)
+                };
+            }
+
+            iridescence(baseColor, angle = 0, intensity = 0.8) {
+                this.updateTime();
+                const shimmer = Math.sin(angle + this.time * 2) * intensity;
+                const hueShift = shimmer * 60;
+
+                const max = Math.max(baseColor.r, baseColor.g, baseColor.b);
+                const min = Math.min(baseColor.r, baseColor.g, baseColor.b);
+                const delta = max - min;
+
+                if (delta === 0) return baseColor;
+
+                let h = 0;
+                if (max === baseColor.r) h = ((baseColor.g - baseColor.b) / delta) % 6;
+                else if (max === baseColor.g) h = (baseColor.b - baseColor.r) / delta + 2;
+                else h = (baseColor.r - baseColor.g) / delta + 4;
+
+                h = (h * 60 + hueShift) % 360;
+                if (h < 0) h += 360;
+
+                const l = (max + min) / 2 / 255;
+                const s = delta === 0 ? 0 : delta / (255 - Math.abs(2 * l * 255 - 255));
+
+                return ColorFunctions.hslToRgb(h, s * 100, l * 100);
+            }
+
+            bioluminescence(baseColor, glowIntensity = 0.5) {
+                this.updateTime();
+                const pulse = Math.sin(this.time * 2) * glowIntensity + 1;
+
+                return {
+                    r: ColorFunctions.clamp(baseColor.r * pulse * 0.3),
+                    g: ColorFunctions.clamp(baseColor.g * pulse * 1.2),
+                    b: ColorFunctions.clamp(baseColor.b * pulse * 0.8)
+                };
+            }
+
+            underwaterCaustics(baseColor, depth = 0.5) {
+                this.updateTime();
+                const wave1 = Math.sin(this.time * 0.7 + depth * 3) * 0.3;
+                const wave2 = Math.cos(this.time * 1.1 + depth * 2) * 0.2;
+                const causticEffect = (wave1 + wave2) * 0.5 + 1;
+
+                return {
+                    r: ColorFunctions.clamp(baseColor.r * (1 - depth * 0.7)),
+                    g: ColorFunctions.clamp(baseColor.g * (1 - depth * 0.4) * causticEffect),
+                    b: ColorFunctions.clamp(baseColor.b * causticEffect)
+                };
+            }
+
+            auroraTransform(baseColor, altitude = 0.5) {
+                this.updateTime();
+                const dance = Math.sin(this.time * 0.5 + altitude * 2) * 0.5 + 0.5;
+                const greenIntensity = Math.sin(altitude * Math.PI) * 0.8 * dance;
+                const purpleIntensity = Math.cos(altitude * Math.PI * 0.7) * 0.6 * dance;
+
+                return {
+                    r: ColorFunctions.clamp(baseColor.r + purpleIntensity * 100),
+                    g: ColorFunctions.clamp(baseColor.g + greenIntensity * 150),
+                    b: ColorFunctions.clamp(baseColor.b + (greenIntensity + purpleIntensity) * 80)
+                };
+            }
+
+            xenCrystal(baseColor, resonance = 0.5) {
+                this.updateTime();
+                const harmonic = Math.sin(this.time * 4 + resonance * 6) * 0.4 + 0.6;
+                const energy = Math.cos(this.time * 2.3) * 0.3 + 0.7;
+
+                return {
+                    r: ColorFunctions.clamp(baseColor.r * 0.2 + 100 * harmonic),
+                    g: ColorFunctions.clamp(baseColor.g * 0.8 + 150 * energy),
+                    b: ColorFunctions.clamp(baseColor.b * 1.2 + 200 * harmonic)
+                };
+            }
+
+            gravityGun(baseColor, charge = 0.5) {
+                this.updateTime();
+                const field = Math.sin(this.time * 6) * charge * 0.5 + charge;
+                const distortion = Math.cos(this.time * 8) * 0.2 + 0.8;
+
+                return {
+                    r: ColorFunctions.clamp(baseColor.r * (1 - field * 0.5) + field * 50),
+                    g: ColorFunctions.clamp(baseColor.g * distortion + field * 100),
+                    b: ColorFunctions.clamp(baseColor.b * (1 + field * 0.8) + field * 150)
+                };
+            }
+
+            oilSlick(baseColor, thickness = 0.5) {
+                this.updateTime();
+                const interference = Math.sin(thickness * 10 + this.time * 3) * 0.5 + 0.5;
+                const hueShift = interference * 180 + 180;
+
+                return ColorFunctions.hslToRgb(
+                    hueShift,
+                    80 + interference * 20,
+                    30 + interference * 40
+                );
+            }
+
+            chromaticAberration(baseColor, intensity = 0.1) {
+                return {
+                    r: ColorFunctions.clamp(baseColor.r + intensity * 50),
+                    g: baseColor.g,
+                    b: ColorFunctions.clamp(baseColor.b - intensity * 30)
+                };
+            }
+
+            static rgbToHex(r, g, b) {
+                return '#' + [r, g, b].map(x => {
+                    const hex = Math.round(x).toString(16);
+                    return hex.length === 1 ? '0' + hex : hex;
+                }).join('');
+            }
+
+            static hexToRgb(hex) {
+                const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+                return result ? {
+                    r: parseInt(result[1], 16),
+                    g: parseInt(result[2], 16),
+                    b: parseInt(result[3], 16)
+                } : null;
+            }
+        }
+
+        // App logic
+        const colorFunctions = new ColorFunctions();
+        let isAnimating = false;
+        let animationFrame;
+
+        const baseColorInput = document.getElementById('baseColor');
+        const baseColorValue = document.getElementById('baseColorValue');
+        const primaryEffectSelect = document.getElementById('primaryEffect');
+        const intensitySlider = document.getElementById('intensity');
+        const intensityValue = document.getElementById('intensityValue');
+        const mainSwatch = document.getElementById('mainSwatch');
+        const effectGrid = document.getElementById('effectGrid');
+        const toast = document.getElementById('toast');
+
+        // Update base color display
+        baseColorInput.addEventListener('input', () => {
+            baseColorValue.textContent = baseColorInput.value;
+            generateSwatch();
+        });
+
+        // Update intensity display
+        intensitySlider.addEventListener('input', () => {
+            intensityValue.textContent = intensitySlider.value;
+            generateSwatch();
+        });
+
+        // Update on effect change
+        primaryEffectSelect.addEventListener('change', generateSwatch);
+
+        function generateSwatch() {
+            const baseColor = ColorFunctions.hexToRgb(baseColorInput.value);
+            const effect = primaryEffectSelect.value;
+            const intensity = parseFloat(intensitySlider.value);
+
+            mainSwatch.innerHTML = '';
+
+            // Generate 12 color variations
+            for (let i = 0; i < 12; i++) {
+                const variation = i / 11;
+                let transformedColor;
+
+                switch (effect) {
+                    case 'iridescence':
+                        transformedColor = colorFunctions.iridescence(baseColor, variation * Math.PI * 2, intensity);
+                        break;
+                    case 'atmosphericScatter':
+                        transformedColor = colorFunctions.atmosphericScatter(baseColor, variation * intensity);
+                        break;
+                    case 'sunsetGradient':
+                        transformedColor = colorFunctions.sunsetGradient(baseColor, variation);
+                        break;
+                    case 'bioluminescence':
+                        transformedColor = colorFunctions.bioluminescence(baseColor, intensity);
+                        break;
+                    case 'underwaterCaustics':
+                        transformedColor = colorFunctions.underwaterCaustics(baseColor, variation);
+                        break;
+                    case 'auroraTransform':
+                        transformedColor = colorFunctions.auroraTransform(baseColor, variation);
+                        break;
+                    case 'xenCrystal':
+                        transformedColor = colorFunctions.xenCrystal(baseColor, variation * intensity);
+                        break;
+                    case 'gravityGun':
+                        transformedColor = colorFunctions.gravityGun(baseColor, variation * intensity);
+                        break;
+                    case 'oilSlick':
+                        transformedColor = colorFunctions.oilSlick(baseColor, variation * intensity);
+                        break;
+                    case 'chromaticAberration':
+                        transformedColor = colorFunctions.chromaticAberration(baseColor, variation * intensity);
+                        break;
+                    default:
+                        transformedColor = baseColor;
+                }
+
+                const hex = ColorFunctions.rgbToHex(transformedColor.r, transformedColor.g, transformedColor.b);
+                const colorDiv = document.createElement('div');
+                colorDiv.className = 'swatch-color';
+                colorDiv.style.backgroundColor = hex;
+                colorDiv.innerHTML = `<div class="color-hex">${hex}</div>`;
+                colorDiv.addEventListener('click', () => copyToClipboard(hex));
+
+                mainSwatch.appendChild(colorDiv);
+            }
+        }
+
+        function generateEffectGrid() {
+            const effects = [
+                { name: 'atmosphericScatter', title: 'Atmospheric Scatter' },
+                { name: 'iridescence', title: 'Iridescence' },
+                { name: 'bioluminescence', title: 'Bioluminescence' },
+                { name: 'underwaterCaustics', title: 'Underwater Caustics' },
+                { name: 'auroraTransform', title: 'Aurora Transform' },
+                { name: 'xenCrystal', title: 'Xen Crystal' },
+                { name: 'gravityGun', title: 'Gravity Gun' },
+                { name: 'oilSlick', title: 'Oil Slick' }
+            ];
+
+            effectGrid.innerHTML = '';
+            const baseColor = ColorFunctions.hexToRgb(baseColorInput.value);
+
+            effects.forEach(effect => {
+                const demo = document.createElement('div');
+                demo.className = 'effect-demo';
+
+                const title = document.createElement('div');
+                title.className = 'effect-title';
+                title.textContent = effect.title;
+                demo.appendChild(title);
+
+                // Generate 3 variations for each effect
+                for (let i = 0; i < 3; i++) {
+                    const variation = (i + 1) * 0.33;
+                    let transformedColor;
+
+                    switch (effect.name) {
+                        case 'iridescence':
+                            transformedColor = colorFunctions.iridescence(baseColor, variation * Math.PI * 2, 0.8);
+                            break;
+                        case 'atmosphericScatter':
+                            transformedColor = colorFunctions.atmosphericScatter(baseColor, variation);
+                            break;
+                        case 'bioluminescence':
+                            transformedColor = colorFunctions.bioluminescence(baseColor, variation);
+                            break;
+                        case 'underwaterCaustics':
+                            transformedColor = colorFunctions.underwaterCaustics(baseColor, variation);
+                            break;
+                        case 'auroraTransform':
+                            transformedColor = colorFunctions.auroraTransform(baseColor, variation);
+                            break;
+                        case 'xenCrystal':
+                            transformedColor = colorFunctions.xenCrystal(baseColor, variation);
+                            break;
+                        case 'gravityGun':
+                            transformedColor = colorFunctions.gravityGun(baseColor, variation);
+                            break;
+                        case 'oilSlick':
+                            transformedColor = colorFunctions.oilSlick(baseColor, variation);
+                            break;
+                    }
+
+                    const hex = ColorFunctions.rgbToHex(transformedColor.r, transformedColor.g, transformedColor.b);
+                    const miniSwatch = document.createElement('div');
+                    miniSwatch.className = 'mini-swatch';
+                    miniSwatch.style.backgroundColor = hex;
+                    miniSwatch.textContent = hex;
+                    miniSwatch.addEventListener('click', () => copyToClipboard(hex));
+
+                    demo.appendChild(miniSwatch);
+                }
+
+                effectGrid.appendChild(demo);
+            });
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                showToast();
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
+            });
+        }
+
+        function showToast() {
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2000);
+        }
+
+        function randomizeColor() {
+            const randomHex = '#' + Math.floor(Math.random()*16777215).toString(16).padStart(6, '0');
+            baseColorInput.value = randomHex;
+            baseColorValue.textContent = randomHex;
+            generateSwatch();
+            generateEffectGrid();
+        }
+
+        function generateNewSwatch() {
+            generateSwatch();
+            generateEffectGrid();
+        }
+
+        function toggleAnimation() {
+            const btn = document.getElementById('animateBtn');
+
+            if (isAnimating) {
+                cancelAnimationFrame(animationFrame);
+                isAnimating = false;
+                btn.textContent = 'Start Animation';
+                btn.style.background = 'linear-gradient(45deg, #ff6b6b, #4ecdc4)';
+            } else {
+                isAnimating = true;
+                btn.textContent = 'Stop Animation';
+                btn.style.background = 'linear-gradient(45deg, #ff9ff3, #54a0ff)';
+                animate();
+            }
+        }
+
+        function animate() {
+            if (isAnimating) {
+                colorFunctions.updateTime();
+                generateSwatch();
+                animationFrame = requestAnimationFrame(animate);
+            }
+        }
+
+        // Initialize
+        generateSwatch();
+        generateEffectGrid();
+    </script>
+</body>
+</html>

@@ -31,23 +31,10 @@ export class DatabasePlugin {
 
     // this.databases = new StoredMap(null, {prefix: 'pishposh-databases'});
 
-    // this.pishposhStations = new PersistentMap(null, {prefix: 'pishposh-stations', onRestored:db=>db.forEach((v,k)=>this.app.emit('stationRestore', v))});
-    this.pishposhStations = new PersistentMap(null, {prefix: 'pishposh-stations', onRestored:db=>{
-      console.log(db)
-
-      for (const item of db){
-      console.log(item)
-
-      };
-
-      db.forEach((v,k)=>{
-        console.info('stationRestore', v)
-        this.app.emit('stationRestore', v)
-      })
-    }
-    });
+    this.pishposhStations = new PersistentMap(null, {prefix: 'pishposh-stations', onRestored:db=>db.forEach((v,k)=>this.app.emit('stationRestore', v))});
 
     this.app.on('stationAdded', data => this.pishposhStations.set(data.id, data.serialize()));
+    this.app.on('stationUpdated', data => this.pishposhStations.set(data.id, data.serialize()));
     this.app.on('stationRemoved', id => this.pishposhStations.delete(id));
 
     this.pishposhPorts = new PersistentMap(null, {prefix: 'pishposh-ports', onRestored:db=>db.forEach((v,k)=>this.app.emit('portRestore', v))});

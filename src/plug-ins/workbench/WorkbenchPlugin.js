@@ -27,8 +27,13 @@ export class WorkbenchPlugin {
     this.app = app;
     this.svg = app.svg;
 
+    const myTool = {name:'panZoom',  data:{id:'pan-zoom-tool', icon:'bi-binoculars', iconSelected:'bi-binoculars-fill', description:'pan and zoom' }};
+    this.app.emit('registerTool', myTool);
+    this.app.emit('selectTool', myTool.name);
+
+
     // Initialize the engine and plugins
-    this.engine = new PanZoomEngine(this.svg);
+    this.engine = new PanZoomEngine(this.app, this.svg);
 
     // CRITICAL: ResizeObserverPlugin Must be first!
     this.engine.use(new ResizeObserverPlugin());
@@ -52,7 +57,7 @@ export class WorkbenchPlugin {
       opacityThreshold: 0.7
     });
 
-    this.engine.use(gridPlugin).start();
+    this.engine.use(gridPlugin);
 
     this.engine.start();
 

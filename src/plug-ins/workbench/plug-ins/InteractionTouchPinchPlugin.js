@@ -33,6 +33,7 @@ export class InteractionTouchPinchPlugin {
   }
 
   onTouchStart = (event) => {
+    if(!this.engine.isActive) return;
     if (event.touches.length === 2) {
       event.preventDefault();
       this.isPinching = true;

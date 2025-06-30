@@ -205,45 +205,10 @@ svg:active {
   stroke: var(--blue);
 }
 
-/* Connection Path */
-.connection-path {
-  stroke: var(--green);
-  stroke-width: 6;
-  fill: none;
-  stroke-linecap: round;
-}
-
-/* Temp Connection Line */
-.temp-line {
-  stroke: var(--orange);
-  stroke-width: 4;
-  fill: none;
-  stroke-dasharray: 5, 5;
-  pointer-events: none;
-}
-
-/* Labels */
-.label-text,
-.connection-label {
-  font-family: Arial, sans-serif;
-  font-size: 14px;
-  font-weight: bold;
-  fill: var(--text);
-  text-anchor: middle;
-  dominant-baseline: middle;
-  paint-order: stroke fill;
-  stroke: var(--background);
-  stroke-width: 2;
-  stroke-linejoin: round;
-  cursor: pointer;
-  letter-spacing: 0.01em;
-}
 .station-label {
   font-size: 12px;
 }
-.connection-label {
-  stroke-width: 3;
-}
+
 
 /* Controls and Info */
 .header {

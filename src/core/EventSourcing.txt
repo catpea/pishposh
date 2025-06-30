@@ -1,0 +1,47 @@
+
+
+// Usage Examples:
+
+/*
+// Basic usage with event sourcing
+const emitter = new EventSourcing({
+  snapshotInterval: 50,
+  maxLogSize: 1000,
+  persistence: new EventSourcingMemoryPersistence()
+});
+
+// Listen to events
+emitter.on('user.created', (data, event) => {
+  console.log('User created:', data.name, 'at', event.timestamp);
+});
+
+// Emit events with metadata
+emitter.emit('user.created',
+  { id: 1, name: 'John' },
+  { metadata: { source: 'api', userId: 'admin' } }
+);
+
+// Query events
+const userEvents = emitter.getEvents({
+  event: 'user.created',
+  fromTimestamp: '2023-01-01'
+});
+
+// Create projections
+const userProjection = emitter.project((state, event) => {
+  if (event.event === 'user.created') {
+    state.users = state.users || [];
+    state.users.push(event.data);
+  }
+  return state;
+});
+
+// Create snapshots
+emitter.createSnapshot({ customData: 'state' });
+
+// Replay events
+emitter.replay(0, 100); // Replay events 0-100
+
+// Get statistics
+console.log(emitter.getStats());
+*/
