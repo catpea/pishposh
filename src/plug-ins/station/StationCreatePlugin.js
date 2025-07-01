@@ -31,30 +31,20 @@ export class StationCreatePlugin {
     this.app.emit(...argv);
   }
 
-  stationAddRequest(raw) {
-    const station = this.newStation(raw);
+  async stationAddRequest(raw) {
+    const station = new Station(raw);
     this.stationInstances.set(station.id, station);
     this.eventDispatch('stationAdded', station);
     return station;
   }
-  stationRestore(options) {
-    const station = this.newStation(options);
+
+  async stationRestore(options) {
+    const station = new Station(options);
     this.stationInstances.set(station.id, station);
     this.eventDispatch('stationRestored', station);
     return station;
   }
 
-
-
-  newStation(options){
-    const station = new Station(options);
-    // const unsubscribe = station.stream.debounce(500).subscribe(hello=>{
-    //   console.info('HELLO', hello);
-    //   // this.app.emit('stationUpdate', station)
-    // })
-    // this.subscriptions.add(unsubscribe);
-    return station;
-  }
 
 
 }

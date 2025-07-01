@@ -10,15 +10,15 @@ export class Station {
     y:0,
     r:32,
     label: 'Untitled',
-    type: 'station/plain',
+    agentType: 'basic/pass-through',
   };
 
   #acceptable = [
-    'id','x','y','r','label','type'
+    'id','x','y','r','label','agentType'
   ];
 
   #serializable = [
-    'id','x','y','r','label','type'
+    'id','x','y','r','label','agentType'
   ]
 
   constructor(configure) {
@@ -31,7 +31,7 @@ export class Station {
   setup(options){
 
     this.#signalStorage.id = new Signal(options.id??rid());
-    this.#signalStorage.type = new Signal(options.type);
+    this.#signalStorage.agentType = new Signal(options.agentType);
     this.#signalStorage.label = new Signal(options.label);
     this.#signalStorage.x = new Signal(options.x);
     this.#signalStorage.y = new Signal(options.y);
@@ -57,8 +57,8 @@ export class Station {
 
   get id(){ return this.#signalStorage.id.value; } // hidden, unless asked
 
-  get type(){ return this.#signalStorage.type.value; }
-  set type(v){ this.#signalStorage.type.value = v; }
+  get agentType(){ return this.#signalStorage.agentType.value; }
+  set agentType(v){ this.#signalStorage.agentType.value = v; }
 
   get x(){ return this.#signalStorage.x.value; }
   set x(v){ this.#signalStorage.x.value = v; }

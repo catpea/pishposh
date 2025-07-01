@@ -24,19 +24,11 @@ export class EventEmitter {
   }
 
   emit(event, data) {
-
     const subscribers = this.eventNames.get(event) ?? new Set();
     for (const subscriber of subscribers) {
       subscriber(data);
     }
-
   }
-
-  terminate() {
-    this.eventNames.forEach((subscribers) => subscribers.clear());
-    this.eventNames.clear();
-  }
-
 }
 
 class StreamEmitter extends EventEmitter {

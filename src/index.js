@@ -19,6 +19,10 @@ import { StationMovePlugin } from './plug-ins/station/StationMovePlugin.js';
 import { StationDeletePlugin } from './plug-ins/station/StationDeletePlugin.js';
 import { StationCreatePlugin } from './plug-ins/station/StationCreatePlugin.js';
 
+import { AgentManagerPlugin } from './plug-ins/agent/AgentManagerPlugin.js';
+import { PortManagerPlugin } from './plug-ins/ports/PortManagerPlugin.js';
+
+
 // import { StationPlugin } from './plug-ins/StationPlugin.js';
 // import { ConnectPlugin } from './plug-ins/ConnectPlugin.js';
 // import { ConnectionLinePlugin } from './plug-ins/ConnectionLinePlugin.js';
@@ -82,11 +86,18 @@ export class SubwayBuilder extends HTMLElement {
 
 
         // Station System
+        // respond to click on canvas create stations
         app.use(new StationManagerPlugin());
         app.use(new StationRenderPlugin());
         app.use(new StationMovePlugin());
         app.use(new StationDeletePlugin());
         app.use(new StationCreatePlugin());
+
+        // listen for stations being created, load agent manifests, and create  agents
+        app.use(new AgentManagerPlugin());
+
+        // listen for agents being created, use their manifest to draw ports
+        app.use(new PortManagerPlugin());
 
         // Connection System
         app.use(new ConnectionManagerPlugin());
