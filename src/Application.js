@@ -1,5 +1,5 @@
 // SubwayMapBuilder.js
-import { ReactiveEmitter as EventEmitter,  ReactiveEventSourcingStream, ReactiveSignal as Signal } from "./core/Signal.js";
+import { ReactiveEmitter as EventEmitter,   ReactiveSignal as Signal } from "./core/Signal.js";
 import { Graph } from './core/Graph.js';
 import { getVisibleBounds } from './core/Utils.js';
 
@@ -9,7 +9,6 @@ export class Application extends EventEmitter {
 
         // All Plugins Use This
         this.tool = new Signal();
-        this.log = new ReactiveEventSourcingStream();
 
         this.svg = svgElement;
         this.viewBox = { x: 0, y: 0, width: 1200, height: 800 };
