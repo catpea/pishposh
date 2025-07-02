@@ -28,6 +28,9 @@ export class GhostLinePlugin extends Plugin {
     this.app.svg.addEventListener("mousemove", (e) => this.onMouseMove(e));
     this.app.svg.addEventListener("mouseup", (e) => this.onMouseUp(e));
 
+
+
+
   }
 
   stop() {
@@ -48,10 +51,14 @@ export class GhostLinePlugin extends Plugin {
     const fromPortId = e.target.dataset.portId;
     const fromPort = this.portInstances.get(fromPortId);
 
+    const fromStationId = e.target.dataset.stationId;
+    const fromStation = this.portInstances.get(fromPortId);
+
     if (!fromPort) return;
 
     this.isConnecting = true;
     this.fromPortId = fromPortId;
+    this.fromStationId = fromStationId;
 
     const fromPos = { x: fromPort.x.value, y: fromPort.y.value };
 
@@ -78,12 +85,18 @@ export class GhostLinePlugin extends Plugin {
     if ( !this.isConnecting) return;
 
     if (e.target.classList.contains("station-port")) {
+      const toStationId = e.target.dataset.stationId;
       const toPortId = e.target.dataset.portId;
       if (toPortId !== this.fromPortId) {
 
         // this.app.emit("beforeConnectionCreate", { from: this.fromStationId, to: toStationId });
         // const connection = this.graph.addConnection({ fromId: this.fromStationId, toId: toStationId, type: "ConnectionAgent" });
-        const connection = { fromId: this.fromPortId, toId: toPortId, type: "ConnectionAgent" }
+        const connection = {
+          fromStationId: this.fromStationId,
+          fromId: this.fromPortId,
+          toStationId: toStationId,
+          toId: toPortId,
+          type: "ConnectionAgent" }
         this.app.emit("connectionAddRequest", connection);
 
       }

@@ -27,6 +27,7 @@ export class PortManagerPlugin extends Plugin {
 
     this.app.on("agentAdded", (agent) => this.instantiatePorts(agent));
     this.app.on("agentRemoved", (id) => this.destroyPorts(id));
+    this.app.on("stationRemoved", (id) => this.destroyPorts(id));
 
    this.loadStyleSheet(new URL('./style.css', import.meta.url).href);
 
@@ -131,11 +132,11 @@ export class PortManagerPlugin extends Plugin {
   destroyPorts(stationId) {
 
     // Remove ports matching the condition (it is safe to delete items being iterated via forEach)
-    portInstances.forEach((port, key) => {
+    this.portInstances.forEach((port, key) => {
         if (port.stationId == stationId) {
             port.portElement.remove();
             port.unsubscribe.forEach(stop=>stop())
-            portInstances.delete(key);
+            this.portInstances.delete(key);
         }
     });
 

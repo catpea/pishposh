@@ -44,7 +44,9 @@ export class AgentManagerPlugin extends Plugin {
   }
 
   destroyAgent(id) {
-    agentInstances.delete(id);
+    const agent = this.agentInstances.get(id);
+    agent.stop();
+    this.agentInstances.delete(id);
   }
 
   async fetchManifest(agentRoot, basePath, fileName = "manifest.json") {

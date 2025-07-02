@@ -19,6 +19,23 @@ export class ConnectionDeletePlugin {
    this.app.on('selectConnection', connection => (this.app.selectedTool.value == 'disconnect') && this.connectionRemove(connection.id));
    this.app.on('connectionRemove', id => this.connectionRemove(id) );
 
+   this.app.on('stationRemoved', stationId => {
+
+
+          this.connectionInstances.values().filter(({fromStationId})=>fromStationId===stationId)
+       .forEach(({fromStationId})=>console.log('AAA', {fromStationId}));
+          this.connectionInstances.values().filter(({toStationId})=>toStationId===stationId)
+       .forEach(({toStationId})=>console.log('AAA', {toStationId}));
+
+
+     this.connectionInstances.values().filter(({fromStationId})=>fromStationId===stationId).forEach(({id})=>this.connectionRemove(id));
+     this.connectionInstances.values().filter(({toStationId})=>toStationId===stationId).forEach(({id})=>this.connectionRemove(id));
+
+
+
+   });
+
+
   }
 
   stop() {
@@ -32,7 +49,7 @@ export class ConnectionDeletePlugin {
   }
 
   connectionRemove(id) {
-    console.log('connectionRemove',id, this.connectionInstances.has(id));
+    console.log('connectionRemove', id, this.connectionInstances.has(id));
     if (!id) return console.warn("Attempted to remove a connection without an id.");
     if (!this.connectionInstances.has(id)) return console.warn(`No connection found with id: ${id}`);
     this.connectionInstances.delete(id);

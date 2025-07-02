@@ -4,5 +4,6 @@ export default class PassThrough {
     this.id = id;
     console.log('PassThrough DDDDDDDDDDDDDDDDDDDDDDD');
   }
-
+  start(){}
+  stop(){}
 }

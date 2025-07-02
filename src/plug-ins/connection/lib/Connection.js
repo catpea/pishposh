@@ -6,6 +6,8 @@ export class Connection {
   #signalStorage = {};
 
   #defaults = {
+    fromStationId:0,
+    toStationId:0,
     fromId:0,
     toId:0,
     startLabel: 'output>',
@@ -15,11 +17,27 @@ export class Connection {
   };
 
   #acceptable = [
-    'id','fromId','toId','startLabel','centerLabel','endLabel','agentType'
+    'id',
+    'fromId',
+    'toId',
+    'fromStationId',
+    'toStationId',
+    'startLabel',
+    'centerLabel',
+    'endLabel',
+    'agentType'
   ];
 
   #serializable = [
-    'id','fromId','toId','startLabel','centerLabel','endLabel','agentType'
+    'id',
+    'fromId',
+    'toId',
+    'fromStationId',
+    'toStationId',
+    'startLabel',
+    'centerLabel',
+    'endLabel',
+    'agentType'
   ]
 
   constructor(configure) {
@@ -35,6 +53,9 @@ export class Connection {
 
     this.#signalStorage.fromId = new Signal(options.fromId);
     this.#signalStorage.toId = new Signal(options.toId);
+    this.#signalStorage.fromStationId = new Signal(options.fromStationId);
+    this.#signalStorage.toStationId = new Signal(options.toStationId);
+
     this.#signalStorage.startLabel = new Signal(options.startLabel);
     this.#signalStorage.centerLabel = new Signal(options.centerLabel);
     this.#signalStorage.endLabel = new Signal(options.endLabel);
@@ -65,6 +86,12 @@ export class Connection {
 
   get toId(){ return this.#signalStorage.toId.value; }
   set toId(v){ this.#signalStorage.toId.value = v; }
+
+  get fromStationId(){ return this.#signalStorage.fromStationId.value; }
+  set fromStationId(v){ this.#signalStorage.fromStationId.value = v; }
+
+  get toStationId(){ return this.#signalStorage.toStationId.value; }
+  set toStationId(v){ this.#signalStorage.toStationId.value = v; }
 
   get startLabel(){ return this.#signalStorage.startLabel.value; }
   set startLabel(v){ this.#signalStorage.startLabel.value = v; }

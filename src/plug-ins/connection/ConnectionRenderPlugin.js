@@ -27,6 +27,9 @@ export class ConnectionRenderPlugin extends Plugin {
     this.app.on("connectionAdded", (connection) => this.renderConnection(connection));
     this.app.on("connectionRestored", (connection) => this.renderConnection(connection));
     this.app.on("connectionRemoved", (id) => this.removeConnection(id));
+
+    // this.app.on("stationRemoved", (id) => this.destroyPorts(id));
+
   }
 
   stop() {
@@ -35,6 +38,7 @@ export class ConnectionRenderPlugin extends Plugin {
   }
 
   removeConnection(id) {
+    console.log('AAA', 'RENDERER removeConnection');
     const path = this.svg.querySelector(`.connection-path[data-connection-id="${id}"]`);
     const labels = this.svg.querySelectorAll(`.connection-label[data-connection-id="${id}"]`);
     if (path) path.remove();
@@ -50,7 +54,8 @@ export class ConnectionRenderPlugin extends Plugin {
 
     console.log('renderConnection', {from: fromPort, to: toPort})
 
-    if (!fromPort || !toPort) return;
+    console.error('TIME TRAVEL ERROR ON RESTORE!!! Ports are not yet in portInstances when ConnectionRenderPlugin.renderConnection(c) is aking for them.')
+    if (!fromPort || !toPort) return setTimeout(()=>this.renderConnection(connection),333);
 
     const pathId = `path-${connection.id}`;
 
@@ -116,6 +121,7 @@ export class ConnectionRenderPlugin extends Plugin {
     };
 
     // Subscribe position changes
+    console.error('UNSUBSCRIBE ME!')
     fromPort.x.subscribe(updateAll);
     fromPort.y.subscribe(updateAll);
     toPort.x.subscribe(updateAll);
