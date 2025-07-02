@@ -11,8 +11,6 @@ import { WorkbenchPlugin } from './plug-ins/workbench/WorkbenchPlugin.js';
 // // v1: import { PanZoomPlugin } from './plug-ins/PanZoomPlugin.js';
 // import { PanZoomPlugin } from './plug-ins/pan-zoom/PanZoomPlugin.js';
 
-import { ConnectionManagerPlugin } from './plug-ins/connection/ConnectionManagerPlugin.js';
-
 import { StationManagerPlugin } from './plug-ins/station/StationManagerPlugin.js';
 import { StationRenderPlugin } from './plug-ins/station/StationRenderPlugin.js';
 import { StationMovePlugin } from './plug-ins/station/StationMovePlugin.js';
@@ -22,11 +20,15 @@ import { StationCreatePlugin } from './plug-ins/station/StationCreatePlugin.js';
 import { AgentManagerPlugin } from './plug-ins/agent/AgentManagerPlugin.js';
 import { PortManagerPlugin } from './plug-ins/ports/PortManagerPlugin.js';
 
+import {GhostLinePlugin } from './plug-ins/connection/GhostLinePlugin.js';
+import {ConnectionManagerPlugin } from './plug-ins/connection/ConnectionManagerPlugin.js';
+import {ConnectionRenderPlugin } from './plug-ins/connection/ConnectionRenderPlugin.js';
+import {ConnectionDeletePlugin } from './plug-ins/connection/ConnectionDeletePlugin.js';
+import {ConnectionCreatePlugin } from './plug-ins/connection/ConnectionCreatePlugin.js';
 
-// import { StationPlugin } from './plug-ins/StationPlugin.js';
-// import { ConnectPlugin } from './plug-ins/ConnectPlugin.js';
-// import { ConnectionLinePlugin } from './plug-ins/ConnectionLinePlugin.js';
-// import { MoveStationPlugin } from './plug-ins/MoveStationPlugin.js';
+
+
+
 
 // import { AgentsPlugin } from './plug-ins/AgentsPlugin.js';
 // import { AgentLibraryPlugin } from './plug-ins/AgentLibraryPlugin.js';
@@ -100,7 +102,11 @@ export class SubwayBuilder extends HTMLElement {
         app.use(new PortManagerPlugin());
 
         // Connection System
+        app.use(new GhostLinePlugin());
         app.use(new ConnectionManagerPlugin());
+        app.use(new ConnectionRenderPlugin());
+        app.use(new ConnectionDeletePlugin());
+        app.use(new ConnectionCreatePlugin());
 
         // app.use(new StationPlugin());
         // app.use(new ConnectPlugin());

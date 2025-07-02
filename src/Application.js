@@ -22,7 +22,7 @@ export class Application extends EventEmitter {
           stations: document.createElementNS('http://www.w3.org/2000/svg', 'g'),
           ports: document.createElementNS('http://www.w3.org/2000/svg', 'g'),
           labels: document.createElementNS('http://www.w3.org/2000/svg', 'g'),
-          temp: document.createElementNS('http://www.w3.org/2000/svg', 'g'),
+          ghost: document.createElementNS('http://www.w3.org/2000/svg', 'g'),
         };
 
         this.plugins = new Map();
@@ -44,7 +44,7 @@ export class Application extends EventEmitter {
 
         const viewport = this.svg.querySelector('#viewport');
 
-        Object.values(this.layers).forEach(layer => viewport.appendChild(layer));
+        Object.entries(this.layers).forEach(([id,layer]) => { viewport.appendChild(layer); layer.id = id});
         this.updateViewBox();
 
 

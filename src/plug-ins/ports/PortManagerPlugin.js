@@ -85,44 +85,59 @@ export class PortManagerPlugin extends Plugin {
     }
 
 
-    const socket = document.createElementNS("http://www.w3.org/2000/svg", "g");
-    socket.setAttribute("class", "socket");
-    socket.setAttribute("data-station-id", station.id);
-    this.app.layers.ports.appendChild(socket);
 
+    for(const rawPort of [...leftHemisphere, ...rightHemisphere]){
 
-    const ports = [];
-    for(const port of [...leftHemisphere, ...rightHemisphere]){
+      const portElement = document.createElementNS("http://www.w3.org/2000/svg", "circle");
 
-      const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-      circle.setAttribute("class", "port-circle");
-      circle.setAttribute("data-port-id", port.id);
-      circle.setAttribute("data-port-station-id", station.id);
-      circle.setAttribute("r", portRadius);
+      portElement.setAttribute("class", "station-port");
+      portElement.setAttribute("data-port-id", rawPort.id);
+      portElement.setAttribute("data-station-id", station.id);
+      portElement.setAttribute("r", portRadius);
+
+      const port = {
+        stationId: station.id,
+        portElement,
+        x: new Signal(0),
+        y: new Signal(0),
+        unsubscribe: new Set(),
+      };
+
+      this.portInstances.set(rawPort.id, port);
+
+      const unsubscribeCx = port.x.subscribe(v=>portElement.setAttribute("cx", v));
+      const unsubscribeCy = port.y.subscribe(v=>portElement.setAttribute("cy", v));
+
+      port.unsubscribe.add(unsubscribeCx);
+      port.unsubscribe.add(unsubscribeCy);
 
       station.subscribe(({x,y,r})=>{
-
-        const {x:portX, y:portY} = this.placeCircleOnCircumference(port.angle, x,y,r*1.3);
-        circle.setAttribute("cx", portX);
-        circle.setAttribute("cy", portY);
-
+        const pos = this.placeCircleOnCircumference(rawPort.angle, x,y,r*1.3);
+        port.x.value = pos.x;
+        port.y.value = pos.y;
       });
 
-      circle.addEventListener("click",()=> this.eventDispatch("selectPort", port) );
-      socket.appendChild(circle);
+      // listeners are automatically removed when portElement is .removed(); (in modern browsers)
+      portElement.addEventListener("click",()=> this.eventDispatch("selectPort", port) );
+
+      this.app.layers.ports.appendChild(portElement);
 
     }
 
-    // this.portInstances.set(agentType, manifest);
     // this.eventDispatch('manifestAdded', manifest);
 
   }
 
   destroyPorts(stationId) {
-    // const agent = portInstances.get(id);
-    // agent.stop();
-    // portInstances.delete(id);
-      this.app.layers.ports.querySelector(`g.socket[data-station-id='${stationId}']`).remove();
+
+    // Remove ports matching the condition (it is safe to delete items being iterated via forEach)
+    portInstances.forEach((port, key) => {
+        if (port.stationId == stationId) {
+            port.portElement.remove();
+            port.unsubscribe.forEach(stop=>stop())
+            portInstances.delete(key);
+        }
+    });
 
   }
 

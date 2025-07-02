@@ -86,7 +86,6 @@ export class ToolboxPlugin {
     this.app.emit('registerTool', {name:'group',   data:{id:'group-tool',   icon:'bi-pentagon', iconSelected:'bi-pentagon-fill', description:'group items' }});
 
 
-    this.app.emit('registerTool', {name:'connect',  data:{id:'connect-tool',  icon:'bi-share', iconSelected:'bi-share-fill', description:'connect items' }});
     // this.app.emit('registerTool', {name:'interact', data:{id:'interact-tool', icon:'bi-hand-index-thumb', iconSelected:'bi-hand-index-fill', description:'interact with item' }});
     // this.app.emit('registerTool', {name:'comment',  data:{id:'interact-tool', icon:'bi-pin-angle', iconSelected:'bi-pin-fill', description:'comment tool' }});
 

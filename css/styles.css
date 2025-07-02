@@ -23,6 +23,9 @@ svg[data-tool="pan-zoom-tool"]{
 svg[data-tool="connect-tool"]{
   cursor: crosshair;
 }
+svg[data-tool="disconnect-tool"]{
+  cursor: crosshair;
+}
 
 svg[data-tool="delete-tool"]{
   cursor: no-drop;

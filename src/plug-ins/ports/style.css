@@ -1,12 +1,12 @@
 .port {
   cursor: pointer;
 }
-.port-circle {
+.station-port {
   fill: var(--base02);
   stroke: var(--text);
   stroke-width: 2;
 }
-.port-circle.selected {
+.station-port.selected {
   fill: var(--primary);
   stroke: var(--blue);
 }

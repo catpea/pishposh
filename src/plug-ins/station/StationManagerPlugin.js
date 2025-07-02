@@ -38,23 +38,4 @@ export class StationManagerPlugin extends Plugin {
   }
 
 
-
-
-  // getStation(id) {
-  //   if (!id) throw new Error("Station id is required to retrieve a station.");
-  //   const station = this.stationInstances.get(id);
-  //   if (!station) throw new Error(`No station found with id: ${id}`);
-  //   return station;
-  // }
-
 }
-
-/*
-# USAGE
-  this.stationManager = app.plugins.get('StationManager');
-  this.stationManager.createStation({id:1, x:10, y:10, r:10})
-
-  stationCreated
-  stationRemoved
-
-*/
