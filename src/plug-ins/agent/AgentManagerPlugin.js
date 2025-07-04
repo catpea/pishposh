@@ -33,7 +33,7 @@ export class AgentManagerPlugin extends Plugin {
     const manifest = await this.fetchManifest('agents', agentType);
     this.agentManifests.set(agentType, manifest);
     this.eventDispatch('manifestAdded', manifest);
-    console.log(manifest);
+    // console.log(manifest);
 
     // load main file as specified in manifest
     const Agent = await this.fetchClass('agents', agentType, manifest.files.main);
@@ -57,7 +57,7 @@ export class AgentManagerPlugin extends Plugin {
         throw new Error("Network response was not ok " + response.statusText);
       }
       const manifest = await response.json();
-      console.log(manifest); // Do something with the manifest data
+      //console.log(manifest); // Do something with the manifest data
       return manifest;
     } catch (error) {
       console.error("There was a problem with the fetch operation:", error);

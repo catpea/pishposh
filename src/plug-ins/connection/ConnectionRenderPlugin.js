@@ -54,8 +54,14 @@ export class ConnectionRenderPlugin extends Plugin {
 
     console.log('renderConnection', {from: fromPort, to: toPort})
 
+    if(0){
     console.error('TIME TRAVEL ERROR ON RESTORE!!! Ports are not yet in portInstances when ConnectionRenderPlugin.renderConnection(c) is aking for them.')
     if (!fromPort || !toPort) return setTimeout(()=>this.renderConnection(connection),333);
+    }else{
+      console.log('TT', fromPort || toPort);
+      if (!fromPort || !toPort) return;
+    }
+
 
     const pathId = `path-${connection.id}`;
 

@@ -26,6 +26,7 @@ export class PortManagerPlugin extends Plugin {
 
 
     this.app.on("agentAdded", (agent) => this.instantiatePorts(agent));
+
     this.app.on("agentRemoved", (id) => this.destroyPorts(id));
     this.app.on("stationRemoved", (id) => this.destroyPorts(id));
 
@@ -38,12 +39,13 @@ export class PortManagerPlugin extends Plugin {
     this.subscriptions.clear();
   }
 
-  async instantiatePorts({id}) {
+  async instantiatePorts(agent) {
+    const {id} = agent;
 
     const station = this.stationInstances.get(id);
     console.log(id, this.stationInstances, station)
     const manifest = this.agentManifests.get(station.agentType);
-    const agent = this.agentInstances.get(id);
+    // const agent = this.agentInstances.get(id);
 
 
     const portRadius = 5;
@@ -97,6 +99,7 @@ export class PortManagerPlugin extends Plugin {
       portElement.setAttribute("r", portRadius);
 
       const port = {
+        id: rawPort.id,
         stationId: station.id,
         portElement,
         x: new Signal(0),
@@ -122,10 +125,12 @@ export class PortManagerPlugin extends Plugin {
       portElement.addEventListener("click",()=> this.eventDispatch("selectPort", port) );
 
       this.app.layers.ports.appendChild(portElement);
+      this.eventDispatch("portAdded", port);
 
     }
 
     // this.eventDispatch('manifestAdded', manifest);
+    this.eventDispatch("portsAdded", agent);
 
   }
 

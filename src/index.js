@@ -1,47 +1,32 @@
 // SubwayBuilder.js
-import { Application } from './Application.js';
+import { Application } from "./Application.js";
 
-import { ToolboxPlugin } from './plug-ins/ui/ToolboxPlugin.js';
-import { DatabasePlugin } from './plug-ins/database/DatabasePlugin.js';
-import { WorkbenchPlugin } from './plug-ins/workbench/WorkbenchPlugin.js';
+import { ToolboxPlugin } from "./plug-ins/toolbox/ToolboxPlugin.js";
+import { DatabasePlugin } from "./plug-ins/database/DatabasePlugin.js";
+import { WorkbenchPlugin } from "./plug-ins/workbench/WorkbenchPlugin.js";
 
-// import { GridPlugin } from './plug-ins/GridPlugin.js';
-// import { ToolboxPlugin } from './plug-ins/ToolboxPlugin.js';
+import { StationManagerPlugin } from "./plug-ins/station/StationManagerPlugin.js";
+import { StationRenderPlugin } from "./plug-ins/station/StationRenderPlugin.js";
+import { StationMovePlugin } from "./plug-ins/station/StationMovePlugin.js";
+import { StationDeletePlugin } from "./plug-ins/station/StationDeletePlugin.js";
+import { StationCreatePlugin } from "./plug-ins/station/StationCreatePlugin.js";
 
-// // v1: import { PanZoomPlugin } from './plug-ins/PanZoomPlugin.js';
-// import { PanZoomPlugin } from './plug-ins/pan-zoom/PanZoomPlugin.js';
+import { AgentManagerPlugin } from "./plug-ins/agent/AgentManagerPlugin.js";
+import { PortManagerPlugin } from "./plug-ins/ports/PortManagerPlugin.js";
 
-import { StationManagerPlugin } from './plug-ins/station/StationManagerPlugin.js';
-import { StationRenderPlugin } from './plug-ins/station/StationRenderPlugin.js';
-import { StationMovePlugin } from './plug-ins/station/StationMovePlugin.js';
-import { StationDeletePlugin } from './plug-ins/station/StationDeletePlugin.js';
-import { StationCreatePlugin } from './plug-ins/station/StationCreatePlugin.js';
-
-import { AgentManagerPlugin } from './plug-ins/agent/AgentManagerPlugin.js';
-import { PortManagerPlugin } from './plug-ins/ports/PortManagerPlugin.js';
-
-import {GhostLinePlugin } from './plug-ins/connection/GhostLinePlugin.js';
-import {ConnectionManagerPlugin } from './plug-ins/connection/ConnectionManagerPlugin.js';
-import {ConnectionRenderPlugin } from './plug-ins/connection/ConnectionRenderPlugin.js';
-import {ConnectionDeletePlugin } from './plug-ins/connection/ConnectionDeletePlugin.js';
-import {ConnectionCreatePlugin } from './plug-ins/connection/ConnectionCreatePlugin.js';
-
-
-
-
-
-// import { AgentsPlugin } from './plug-ins/AgentsPlugin.js';
-// import { AgentLibraryPlugin } from './plug-ins/AgentLibraryPlugin.js';
-// import { AgentChooserPlugin } from './plug-ins/AgentChooserPlugin.js';
-// import { PropertiesPanelPlugin } from './plug-ins/PropertiesPanelPlugin.js';
+import { GhostLinePlugin } from "./plug-ins/connection/GhostLinePlugin.js";
+import { ConnectionManagerPlugin } from "./plug-ins/connection/ConnectionManagerPlugin.js";
+import { ConnectionRenderPlugin } from "./plug-ins/connection/ConnectionRenderPlugin.js";
+import { ConnectionDeletePlugin } from "./plug-ins/connection/ConnectionDeletePlugin.js";
+import { ConnectionCreatePlugin } from "./plug-ins/connection/ConnectionCreatePlugin.js";
 
 export class SubwayBuilder extends HTMLElement {
-    constructor() {
-      super();
-    }
+  constructor() {
+    super();
+  }
 
-    connectedCallback() {
-        this.innerHTML = `
+  connectedCallback() {
+    this.innerHTML = `
 
           <div id="ui-container" class="ui-container">
 
@@ -73,60 +58,35 @@ export class SubwayBuilder extends HTMLElement {
           </div>
         `;
 
-        // const svg = this.querySelector('#svg-container');
-        const svg = this.querySelector('#main-svg');
-        const app = new Application(svg);
+    // const svg = this.querySelector('#svg-container');
+    const svg = this.querySelector("#main-svg");
+    const app = new Application(svg);
 
-        app.use(new ToolboxPlugin());
-        app.use(new WorkbenchPlugin());
+    app.use(new ToolboxPlugin());
+    app.use(new WorkbenchPlugin());
 
-        // Core plugins
-        // app.use(new GridPlugin());
-        // app.use(new ToolboxPlugin());
-        // app.use(new PanZoomPlugin());
+    // Station System - respond to click on canvas create stations
+    app.use(new StationManagerPlugin());
+    app.use(new StationRenderPlugin());
+    app.use(new StationMovePlugin());
+    app.use(new StationDeletePlugin());
+    app.use(new StationCreatePlugin());
 
+    // listen for stations being created, load agent manifests, and create  agents
+    app.use(new AgentManagerPlugin());
 
+    // listen for agents being created, use their manifest to draw ports
+    app.use(new PortManagerPlugin());
 
-        // Station System
-        // respond to click on canvas create stations
-        app.use(new StationManagerPlugin());
-        app.use(new StationRenderPlugin());
-        app.use(new StationMovePlugin());
-        app.use(new StationDeletePlugin());
-        app.use(new StationCreatePlugin());
+    // Connection System
+    app.use(new GhostLinePlugin());
+    app.use(new ConnectionManagerPlugin());
+    app.use(new ConnectionRenderPlugin());
+    app.use(new ConnectionDeletePlugin());
+    app.use(new ConnectionCreatePlugin());
 
-        // listen for stations being created, load agent manifests, and create  agents
-        app.use(new AgentManagerPlugin());
+    app.use(new DatabasePlugin());
 
-        // listen for agents being created, use their manifest to draw ports
-        app.use(new PortManagerPlugin());
-
-        // Connection System
-        app.use(new GhostLinePlugin());
-        app.use(new ConnectionManagerPlugin());
-        app.use(new ConnectionRenderPlugin());
-        app.use(new ConnectionDeletePlugin());
-        app.use(new ConnectionCreatePlugin());
-
-        // app.use(new StationPlugin());
-        // app.use(new ConnectPlugin());
-        // app.use(new ConnectionLinePlugin());
-        // app.use(new MoveStationPlugin());
-
-        // // Agent System
-        // app.use(new AgentLibraryPlugin());
-        // app.use(new AgentsPlugin());
-        // app.use(new AgentChooserPlugin({showTitle: false}));
-        // app.use(new PropertiesPanelPlugin());
-        app.use(new DatabasePlugin());
-
-        app.init();
-
-        window.app = app; // Debug access
-
-
-
-
-
-    }
+    app.init();
+  }
 }

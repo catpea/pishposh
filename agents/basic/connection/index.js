@@ -1,8 +1,7 @@
-export default class PassThrough {
+export default class Connection {
   id;
   constructor({id}){
     this.id = id;
-    console.log('PassThrough DDDDDDDDDDDDDDDDDDDDDDD');
   }
   start(){}
   stop(){}

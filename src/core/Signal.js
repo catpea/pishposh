@@ -1,6 +1,10 @@
-export function rid() { // Generate ID
-  const specs = [[3,'abcdefghijklmnopqrstuvwxyz'],[6, 'abcdefghijklmnopqrstuvwxyz0123456789']]
-  return specs.map(([length,chars])=>[...Array(length)].map(() => chars[Math.floor(Math.random() * chars.length)]).join("")).join('');
+export function rid() {
+  // Generate ID
+  const specs = [
+    [3, "abcdefghijklmnopqrstuvwxyz"],
+    [6, "abcdefghijklmnopqrstuvwxyz0123456789"],
+  ];
+  return specs.map(([length, chars]) => [...Array(length)].map(() => chars[Math.floor(Math.random() * chars.length)]).join("")).join("");
 }
 
 export class EventEmitter {
@@ -8,7 +12,8 @@ export class EventEmitter {
 
   constructor() {
     this.eventNames = new Map();
-    this.eventLog = new Set();
+    this.subscriptions = new Set();
+
   }
 
   on(event, subscriber) {
@@ -17,6 +22,51 @@ export class EventEmitter {
     }
     this.eventNames.get(event).add(subscriber);
     return () => this.off(event, subscriber);
+  }
+
+  one(event, subscriber) {
+    if (!this.eventNames.has(event)) {
+      this.eventNames.set(event, new Set());
+    }
+
+    const onceWrapper = (...a) => {
+      subscriber(...a);
+        this.off(event, onceWrapper);
+      }
+
+    this.eventNames.get(event).add(onceWrapper);
+
+
+  }
+
+
+
+
+
+  once(eventName) {
+     return new Promise((resolve, reject) => {
+       const onEvent = (...args) => {
+         this.off('error', onError);
+         resolve(args);
+       };
+       const onError = (error) => {
+         this.off(eventName, onEvent);
+         reject(error);
+       };
+       this.one(eventName, onEvent);
+       this.one('error', onError);
+     });
+   }
+  toPromise(eventName='output') {
+    return new Promise((resolve, reject) => {
+      this.one(eventName, (data) => {
+        resolve(data);
+      });
+
+      this.one('error', (error) => {
+        reject(error);
+      });
+    });
   }
 
   off(event, subscriber) {
@@ -29,32 +79,182 @@ export class EventEmitter {
       subscriber(data);
     }
   }
+
+  terminate(eventName) {
+
+
+    if (eventName) {
+      // Clear specific event's listeners
+      if (this.events.has(eventName)) {
+        this.events.get(eventName).clear(); // Clear the Set
+        this.events.delete(eventName);      // Remove from Map
+      }
+    } else {
+
+      this.subscriptions.forEach((subscriber) => subscriber());
+      this.subscriptions.clear();
+
+      // Clear ALL events and listeners
+      this.eventNames.forEach((listeners, eventName) => {
+        listeners.clear(); // Clear each Set
+      });
+      this.eventNames.clear(); // Clear the entire Map
+    }
+    return this;
+  }
+
+
 }
 
-class StreamEmitter extends EventEmitter {
+
+export class SetTimeoutEmitter extends EventEmitter {
+  constructor(delay) {
+    super();
+    this.timer = setTimeout(() => { this.emit('output', 'timeout') }, delay);
+  }
+
+  terminate() {
+    super.terminate();
+    clearTimeout(this.timer);
+  }
+
+}
+
+
+class SpicyEmitter extends EventEmitter {
+
+  async deferredEmit(eventName, eventData, condFn, ttl, ttlExceptionFn) {
+    console.info('deferredEmit', eventName, eventData, condFn, ttl, ttlExceptionFn)
+    // Early exit: check if condition is immediately satisfied
+    console.info('XXXXXXXXXXX condFn', condFn, condFn);
+
+    const condResult = condFn(eventData);
+
+    console.info('XXXXXXXXXXX condResult', condResult);
+
+    if (condResult === true) {
+      // Synchronous success - emit immediately
+      console.info('Synchronous success - emit immediately')
+      this.emit(eventName, eventData);
+      return;
+    }else{
+      console.info('No synchronous success.')
+    }
+
+    // condResult should be an EventEmitter for async waiting
+    if (!(condResult instanceof EventEmitter)) {
+      console.error('condFn must return true or an EventEmitter')
+      throw new Error('condFn must return true or an EventEmitter');
+    }
+
+    const conditionEmitter = condResult;
+    const timeoutEmitter = new SetTimeoutEmitter(ttl);
+
+
+    // Race between condition satisfaction and timeout
+    console.log('CCC ENTERING RACE', conditionEmitter, timeoutEmitter)
+
+
+    try {
+
+      // Use the new generic race method
+      // const winner = await this.race(foo1, foo2);
+      const winner = await this.race(conditionEmitter, timeoutEmitter);
+        console.log('CCC RACE WINNER', winner)
+
+      if (winner === eventName) {
+        // Condition met - emit the event
+        this.emit(eventName, eventData);
+      } else {
+        // Timeout occurred - call exception handler
+        if (ttlExceptionFn) {
+          ttlExceptionFn(eventName, eventData, ttl);
+        }
+      }
+    } catch (error) {
+      // Handle any errors during the race
+      if (ttlExceptionFn) {
+        ttlExceptionFn(eventName, eventData, ttl, error);
+      }
+    } finally {
+      // Clean up both emitters
+      conditionEmitter.terminate();
+      timeoutEmitter.terminate();
+    }
+
+
+
+
+    // this.race(conditionEmitter, timeoutEmitter) .then((winner) => {
+
+
+    //     console.log('BBB RACE WINNER', winner)
+
+    //     if (winner === 'condition') {
+
+    //       // Condition met - emit the event
+    //       this.emit(eventName, eventData);
+    //     } else {
+
+    //       // Timeout occurred - call exception handler
+    //       if (ttlExceptionFn) {
+    //         ttlExceptionFn(eventName, eventData, ttl);
+    //       }
+
+    //     }
+    //   });
+
+
+      // .catch((error) => {
+      //   // Handle any errors during the race
+      //   console.error(error)
+      //   if (ttlExceptionFn) {
+      //     ttlExceptionFn(eventName, eventData, ttl, error);
+      //   }
+      // })
+      // .finally(() => {
+      //   // Clean up both emitters
+      //   conditionEmitter.terminate();
+      //   timeoutEmitter.terminate();
+      // });
+
+  }
+
+
+
+  race(...emitters) {
+    return Promise.race( emitters.map(emitter => emitter.toPromise()) );
+  }
+
+
+
+
+}
+
+
+
+
+  export class StreamEmitter extends SpicyEmitter {
   name = "StreamEmitter";
   source; // source emitter
 
   // SIGNAL INTEGRATION - Makes StreamEmitter behave a little bit like a signal
   replayLast = false;
   lastValue = null;
-  lastValueTest = (v)=>v!==null;
+  lastValueTest = (v) => v !== null;
 
   constructor() {
     super();
-    this.unsubscribe = new Set();
-
   }
 
   emitValue(value) {
-    if(this.replayLast) this.lastValue = value;
+    if (this.replayLast) this.lastValue = value;
 
     this.emit("value", value);
   }
   subscribe(subscriber) {
-
     // SIGNAL INTEGRATION
-    if(this.replayLast && this.lastValueTest(this.lastValue)) subscriber(this.lastValue)
+    if (this.replayLast && this.lastValueTest(this.lastValue)) subscriber(this.lastValue);
 
     this.on("value", (v) => subscriber(v, this));
     return () => this.off("value", subscriber);
@@ -73,16 +273,11 @@ class StreamEmitter extends EventEmitter {
 
   terminate() {
     super.terminate();
-    this.unsubscribe.forEach((subscriber) => subscriber());
-    this.unsubscribe.clear();
-
-    this.path.forEach(fragment.terminate());
-    super.terminate();
+    // this.path.forEach(fragment=>fragment.terminate());
   }
 }
 
 export class ReactiveEmitter extends StreamEmitter {
-
   name = "ReactiveEmitter";
 
   fromEvent(...argv) {
@@ -132,7 +327,6 @@ export class ReactiveEmitter extends StreamEmitter {
   log(...argv) {
     return log(this, ...argv);
   }
-
 }
 
 export class Signal {
@@ -145,17 +339,17 @@ export class Signal {
 
   // NOTE: Re: test=v=>!v==undefined... null and undefined are considered equal when using the loose equality operator
 
-  constructor(value, same = (a,b) => a==b, test = (v) => v !== undefined) {
+  constructor(value, same = (a, b) => a == b, test = (v) => v !== undefined) {
     this.#value = value;
     this.#test = test;
     this.#same = same;
     this.#subscribers = new Set();
   }
 
-  get(){
+  get() {
     return this.value;
   }
-  set(v){
+  set(v) {
     this.value = v;
   }
 
@@ -183,7 +377,6 @@ export class Signal {
   notify() {
     for (const subscriber of this.#subscribers) subscriber(this.#value);
   }
-
 }
 
 export class ReactiveSignal extends Signal {
@@ -232,7 +425,6 @@ export class ReactiveSignal extends Signal {
   log(...argv) {
     return log(this, ...argv);
   }
-
 }
 
 // Object Stream Operators
@@ -380,7 +572,7 @@ export function log(source, fn) {
   result.source = source;
 
   source.subscribe((value) => {
-    console.log( fn(value));
+    console.log(fn(value));
     result.emitValue(value);
   });
 
@@ -419,7 +611,7 @@ export function fromEvent(source, eventName) {
 
   // Create a function to handle the event
   const eventHandler = (value) => {
-    console.log('eventName', value)
+    console.log("eventName", value);
     result.emitValue(value);
   };
 
@@ -431,25 +623,21 @@ export function fromEvent(source, eventName) {
     source.addEventListener(eventName, eventHandler);
 
     // Add the unsubscribe function to the Set
-    result.unsubscribe.add(() => {
+    result.subscriptions.add(() => {
       source.removeEventListener(eventName, eventHandler);
     });
-
   } else {
     // For other event emitters
     source.on(eventName, eventHandler);
 
     // Add the unsubscribe function to the Set
-    result.unsubscribe.add(() => {
+    result.subscriptions.add(() => {
       source.off(eventName, eventHandler); // Assuming there's an off method
     });
   }
 
   return result;
 }
-
-
-
 
 export function namedCombineLatest(namedSignals) {
   // console.log({namedSignals})
@@ -465,26 +653,22 @@ export function namedCombineLatest(namedSignals) {
   let completedCount = 0;
 
   Object.entries(namedSignals).forEach(([name, signal], index) => {
-
     signal.subscribe((value) => {
-
       values[index] = value;
       hasValue[index] = true;
 
       // Check if all emitters have emitted at least once
       //console.log('ZZZ hasValue.every(Boolean)', hasValue.every(Boolean), hasValue)
       if (hasValue.every(Boolean)) {
-
         const entries = new Array(signalNames.length);
-        for( const [index, name] of signalNames.entries()){
+        for (const [index, name] of signalNames.entries()) {
           entries[index] = [name, values[index]];
         }
-        const obj = Object.fromEntries(entries)
+        const obj = Object.fromEntries(entries);
         //console.log('ZZZ REESDY>', obj)
         result.emitValue(obj); // Emit an array of values
       }
     }); // subscribe to emitter
-
   });
 
   return result;
