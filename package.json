@@ -7,7 +7,7 @@
   "scripts": {
     "app": "nw .",
     "web": "http-server -p 8084 -c-1 .",
-    "save": "git add .; git commit -m 'Updated Release'; npm version patch;  npm publish; git push;"
+    "save": "git add .; git commit -m 'Updated Release'; npm version patch; npm publish; git push --follow-tags;"
   },
   "keywords": [
     "visual-programming-language",

@@ -1,0 +1,27 @@
+.toolbox {
+  --toolbox-spacing: .1rem;
+
+  z-index: 1000;
+
+  padding: var(--toolbox-spacing);
+
+  background: var(--base02);
+  border: 1px solid var(--border);
+
+  margin-bottom: 1rem;
+}
+
+.toolbox-body {
+
+  .row {
+    padding: 0 0 var(--toolbox-spacing);
+  }
+  .col {
+    padding: 0 var(--toolbox-spacing) ;
+  }
+
+  .btn {
+    margin: 0;
+  }
+
+}

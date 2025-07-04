@@ -2,6 +2,8 @@
 import { Application } from "./Application.js";
 
 import { ToolboxPlugin } from "./plug-ins/toolbox/ToolboxPlugin.js";
+import { PalettePlugin } from "./plug-ins/palette/PalettePlugin.js";
+
 import { DatabasePlugin } from "./plug-ins/database/DatabasePlugin.js";
 import { WorkbenchPlugin } from "./plug-ins/workbench/WorkbenchPlugin.js";
 
@@ -30,9 +32,12 @@ export class SubwayBuilder extends HTMLElement {
 
           <div id="ui-container" class="ui-container">
 
+            <div class="start-side snapped-top snapped-start">
+            </div>
+
             <div class="toolbox snapped-top snapped-end rounded shadow" tabindex="-1" style="width: 15vw; min-height: 25vh;">
               <div class="toolbox-body p-3">
-                <small class="text-info">properties</small>
+
               </div>
             </div>
 
@@ -63,6 +68,7 @@ export class SubwayBuilder extends HTMLElement {
     const app = new Application(svg);
 
     app.use(new ToolboxPlugin());
+    app.use(new PalettePlugin());
     app.use(new WorkbenchPlugin());
 
     // Station System - respond to click on canvas create stations
