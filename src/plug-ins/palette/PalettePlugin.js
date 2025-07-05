@@ -18,6 +18,12 @@ export class PalettePlugin extends Plugin {
     this.app = app;
     this.svg = app.svg;
 
+    console.log(this.app.plugins)
+    this.workbenchPlugin = this.app.plugins.get('WorkbenchPlugin');
+    this.engine = this.workbenchPlugin.engine;
+
+
+
     this.uiContainerElement = document.querySelector('#ui-container > .start-side');
     const htmlContent = `
       <div class="palette rounded shadow">
@@ -42,8 +48,39 @@ export class PalettePlugin extends Plugin {
 
     const testList = 'palette plug person-arms-up airplane-engines alarm backpack bank bandaid beaker box2-heart brightness-high bug cake2 camera capsule cassette cloud cone cpu cup-hot postage speaker moon lightning lightbulb hospital fuel-pump flask-florence floppy eye'.split(' ');
     for(const name of testList){
-      this.app.emit('registerAgent', {name:`${name}`,   data:{id:`${name}-agent`,   icon:`bi-${name}`, description:`${name} agent` }});
+      this.app.emit('registerAgent', {name:`${name}`,   data:{id:`${name}-agent`,   icon:`bi-${name}`, description:`${name} agent`, type:'basic/pass-through' }});
     }
+
+
+
+
+
+    this.app.svg.addEventListener("dragover", (e) => {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = "copy";
+    });
+
+    this.app.svg.addEventListener("drop", (e) => {
+      e.preventDefault();
+      const agentType = e.dataTransfer.getData("application/agent-type");
+      const agentName = e.dataTransfer.getData("application/agent-name");
+
+
+      const {x,y} = this.engine.clientToWorld(e.clientX, e.clientY);
+
+
+      // this will trigger this.graph.on('nodeAdded...
+      const node = this.app.graph.addNode({ x , y , type: agentType, label: agentName });
+      const raw = {
+        x,y,
+        // label: agentName,
+        agentType
+      };
+      this.app.emit("stationAddRequest", raw);
+    });
+
+
+
 
     this.loadStyleSheet(new URL('./style.css', import.meta.url).href);
 
@@ -70,7 +107,7 @@ export class PalettePlugin extends Plugin {
       for(const [name, data] of agentList){
         const col = document.createElement("div");
         col.classList.add('col');
-        col.style.textAlign = 'center';
+        // col.style.textAlign = 'center';
         const toolElement = this.renderTool(name, data);
         col.appendChild(toolElement);
         row.appendChild(col);
@@ -82,12 +119,20 @@ export class PalettePlugin extends Plugin {
   } // renderTools
 
   renderTool(agentName, agentData){
-      const agentButton = document.createElement("button");
-      agentButton.classList.add('btn', 'btn-sm');
+
+      const agentButton = document.createElement("span");
+
+      agentButton.classList.add('agent', 'agent-sm');
       agentButton.setAttribute('title', agentData.description);
 
-      console.error('ADD AGENT DRAG')
-      // agentButton.addEventListener('click', ()=>this.eventDispatch('selectTool', agentName))
+      agentButton.setAttribute("draggable", "true");
+      agentButton.addEventListener("dragstart", (e) => {
+        console.log(e)
+        e.dataTransfer.setData("text/plain", agentData.type);
+        e.dataTransfer.setData("application/agent-name", agentName);
+        e.dataTransfer.setData("application/agent-type", agentData.type);
+        e.dataTransfer.effectAllowed = "copy";
+      });
 
       const agentIcon = document.createElement("i");
       agentButton.classList.add('bi', agentData.icon);

@@ -14,14 +14,21 @@
 .toolbox-body {
 
   .row {
+
     padding: 0 0 var(--toolbox-spacing);
   }
   .col {
+
     padding: 0 var(--toolbox-spacing) ;
   }
 
   .btn {
+    &.active {
+      background: var(--active);
+      box-shadow: inset 1px 1px 3px 1px rgba(0,0,0,.5);
+    }
     margin: 0;
   }
+
 
 }

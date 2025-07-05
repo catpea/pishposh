@@ -21,8 +21,46 @@
     padding: 0 var(--palette-spacing) ;
   }
 
-  .btn {
-    margin: 0;
-  }
+
+
+}
+
+
+
+.agent {
+  --my-btn-border-radius: 4px;
+  --my-btn-padding-x: 0.25rem;
+  --my-btn-padding-y: 0.5rem;
+  --my-btn-margin-x: 0.1rem;
+  --my-btn-margin-y: 0rem;
+}
+
+.agent-sm {
+  --my-btn-border-radius: 4px;
+  --my-btn-padding-x: 0.2rem;
+  --my-btn-padding-y: 0.3rem;
+  --my-btn-margin-x: 0.2rem;
+  --my-btn-margin-y: 0rem;
+}
+
+.agent {
+  display: inline-block; /* Element will only take up as much width as needed */
+
+  background: var(--base02);
+  border: 1px solid var(--border);
+  cursor: pointer;
+
+  font-family: inherit;
+  color: var(--text);
+  transition: background 0.2s;
+
+  border-radius: var(--my-btn-border-radius);
+  padding: var(--my-btn-padding-x) var(--my-btn-padding-y);
+  margin: 0
+
+}
+
+.agent-sm {
+
 
 }

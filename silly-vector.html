@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wireframe Face with Lip Sync</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: #000;
+            color: #0f0;
+            font-family: 'Courier New', monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            text-align: center;
+            max-width: 600px;
+        }
+
+        h1 {
+            color: #0f0;
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px #0f0;
+        }
+
+        .controls {
+            margin-bottom: 20px;
+        }
+
+        button {
+            background: #000;
+            color: #0f0;
+            border: 2px solid #0f0;
+            padding: 10px 20px;
+            margin: 5px;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.3s;
+        }
+
+        button:hover {
+            background: #0f0;
+            color: #000;
+            box-shadow: 0 0 15px #0f0;
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .status {
+            margin: 10px 0;
+            font-size: 14px;
+        }
+
+        .level-indicator {
+            width: 300px;
+            height: 20px;
+            border: 2px solid #0f0;
+            margin: 10px auto;
+            position: relative;
+            background: #000;
+        }
+
+        .level-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #0f0, #ff0, #f00);
+            width: 0%;
+            transition: width 0.1s;
+        }
+
+        svg {
+            border: 2px solid #0f0;
+            margin: 20px 0;
+            filter: drop-shadow(0 0 10px #0f0);
+        }
+
+        .wireframe {
+            fill: none;
+            stroke: #0f0;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .eyes {
+            fill: #0f0;
+            stroke: #0f0;
+            stroke-width: 1;
+        }
+
+        .mouth {
+            fill: none;
+            stroke: #0f0;
+            stroke-width: 3;
+            stroke-linecap: round;
+        }
+
+        .info {
+            margin-top: 20px;
+            font-size: 12px;
+            color: #0a0;
+            line-height: 1.4;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>◊ WIREFRAME FACE LIP SYNC ◊</h1>
+
+        <div class="controls">
+            <button id="startBtn">START MICROPHONE</button>
+            <button id="stopBtn" disabled>STOP MICROPHONE</button>
+        </div>
+
+        <div class="status" id="status">Click START to begin</div>
+
+        <div class="level-indicator">
+            <div class="level-bar" id="levelBar"></div>
+        </div>
+
+        <svg width="400" height="500" viewBox="0 0 400 500">
+            <!-- Face outline -->
+            <ellipse cx="200" cy="220" rx="140" ry="180" class="wireframe" />
+
+            <!-- Forehead lines -->
+            <path d="M 120 150 Q 200 140 280 150" class="wireframe" />
+            <path d="M 130 170 Q 200 160 270 170" class="wireframe" />
+
+            <!-- Eyes -->
+            <circle cx="160" cy="190" r="8" class="eyes" />
+            <circle cx="240" cy="190" r="8" class="eyes" />
+
+            <!-- Eye sockets -->
+            <ellipse cx="160" cy="190" rx="25" ry="15" class="wireframe" />
+            <ellipse cx="240" cy="190" rx="25" ry="15" class="wireframe" />
+
+            <!-- Nose -->
+            <path d="M 200 210 L 200 240" class="wireframe" />
+            <path d="M 190 235 Q 200 240 210 235" class="wireframe" />
+            <circle cx="195" cy="235" r="2" class="wireframe" />
+            <circle cx="205" cy="235" r="2" class="wireframe" />
+
+            <!-- Cheekbones -->
+            <path d="M 120 220 Q 140 210 160 220" class="wireframe" />
+            <path d="M 240 220 Q 260 210 280 220" class="wireframe" />
+
+            <!-- Jaw structure -->
+            <path d="M 100 280 Q 120 290 140 285" class="wireframe" />
+            <path d="M 260 285 Q 280 290 300 280" class="wireframe" />
+
+            <!-- Mouth - this will be animated -->
+            <g id="mouth">
+                <!-- Upper lip -->
+                <path id="upperLip" d="M 170 270 Q 200 265 230 270" class="mouth" />
+                <!-- Lower lip -->
+                <path id="lowerLip" d="M 170 270 Q 200 275 230 270" class="mouth" />
+                <!-- Mouth corners -->
+                <circle cx="170" cy="270" r="2" class="mouth" />
+                <circle cx="230" cy="270" r="2" class="mouth" />
+            </g>
+
+            <!-- Chin -->
+            <path d="M 180 350 Q 200 360 220 350" class="wireframe" />
+
+            <!-- Neck -->
+            <path d="M 180 380 L 180 480" class="wireframe" />
+            <path d="M 220 380 L 220 480" class="wireframe" />
+            <path d="M 180 480 L 220 480" class="wireframe" />
+
+            <!-- Additional face structure -->
+            <path d="M 140 300 Q 160 310 180 300" class="wireframe" />
+            <path d="M 220 300 Q 240 310 260 300" class="wireframe" />
+        </svg>
+
+        <div class="info">
+            <p>▸ Microphone analyzes audio frequency and volume</p>
+            <p>▸ Lip movements synchronized to speech patterns</p>
+            <p>▸ Green wireframe aesthetic with real-time animation</p>
+        </div>
+    </div>
+
+    <script>
+        class LipSyncFace {
+            constructor() {
+                this.audioContext = null;
+                this.analyser = null;
+                this.microphone = null;
+                this.dataArray = null;
+                this.isListening = false;
+
+                this.upperLip = document.getElementById('upperLip');
+                this.lowerLip = document.getElementById('lowerLip');
+                this.levelBar = document.getElementById('levelBar');
+                this.status = document.getElementById('status');
+                this.startBtn = document.getElementById('startBtn');
+                this.stopBtn = document.getElementById('stopBtn');
+
+                this.setupEventListeners();
+                this.animationId = null;
+
+                // Mouth shape states - more pronounced movements
+                this.mouthStates = {
+                    closed: {
+                        upper: 'M 170 270 Q 200 268 230 270',
+                        lower: 'M 170 270 Q 200 272 230 270'
+                    },
+                    open: {
+                        upper: 'M 170 270 Q 200 250 230 270',
+                        lower: 'M 170 270 Q 200 295 230 270'
+                    },
+                    wide: {
+                        upper: 'M 160 270 Q 200 265 240 270',
+                        lower: 'M 160 270 Q 200 285 240 270'
+                    },
+                    round: {
+                        upper: 'M 180 265 Q 200 245 220 265',
+                        lower: 'M 180 275 Q 200 300 220 275'
+                    },
+                    extraWide: {
+                        upper: 'M 155 270 Q 200 268 245 270',
+                        lower: 'M 155 270 Q 200 288 245 270'
+                    },
+                    extraOpen: {
+                        upper: 'M 170 270 Q 200 240 230 270',
+                        lower: 'M 170 270 Q 200 310 230 270'
+                    }
+                };
+            }
+
+            setupEventListeners() {
+                this.startBtn.addEventListener('click', () => this.startListening());
+                this.stopBtn.addEventListener('click', () => this.stopListening());
+            }
+
+            async startListening() {
+                try {
+                    this.status.textContent = 'Requesting microphone access...';
+
+                    const stream = await navigator.mediaDevices.getUserMedia({
+                        audio: {
+                            echoCancellation: true,
+                            noiseSuppression: true,
+                            autoGainControl: true
+                        }
+                    });
+
+                    this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    this.analyser = this.audioContext.createAnalyser();
+                    this.microphone = this.audioContext.createMediaStreamSource(stream);
+
+                    this.analyser.fftSize = 512;
+                    this.analyser.smoothingTimeConstant = 0.3;
+
+                    const bufferLength = this.analyser.frequencyBinCount;
+                    this.dataArray = new Uint8Array(bufferLength);
+
+                    this.microphone.connect(this.analyser);
+
+                    this.isListening = true;
+                    this.startBtn.disabled = true;
+                    this.stopBtn.disabled = false;
+                    this.status.textContent = 'Listening... Speak to see lip sync!';
+
+                    this.animate();
+
+                } catch (error) {
+                    console.error('Error accessing microphone:', error);
+                    this.status.textContent = 'Error: Could not access microphone';
+                }
+            }
+
+            stopListening() {
+                this.isListening = false;
+
+                if (this.animationId) {
+                    cancelAnimationFrame(this.animationId);
+                }
+
+                if (this.audioContext) {
+                    this.audioContext.close();
+                }
+
+                this.startBtn.disabled = false;
+                this.stopBtn.disabled = true;
+                this.status.textContent = 'Stopped listening';
+                this.levelBar.style.width = '0%';
+
+                // Reset mouth to closed position
+                this.setMouthShape('closed');
+            }
+
+            animate() {
+                if (!this.isListening) return;
+
+                this.analyser.getByteFrequencyData(this.dataArray);
+
+                // Calculate average volume
+                let sum = 0;
+                for (let i = 0; i < this.dataArray.length; i++) {
+                    sum += this.dataArray[i];
+                }
+                const average = sum / this.dataArray.length;
+
+                // Calculate frequency-based characteristics
+                const lowFreq = this.getFrequencyRange(0, 32);      // Bass
+                const midFreq = this.getFrequencyRange(32, 96);     // Mids
+                const highFreq = this.getFrequencyRange(96, 128);   // Highs
+
+                // Update level indicator
+                const level = (average / 255) * 100;
+                this.levelBar.style.width = `${level}%`;
+
+                // Determine mouth shape based on audio characteristics
+                this.updateMouthShape(average, lowFreq, midFreq, highFreq);
+
+                this.animationId = requestAnimationFrame(() => this.animate());
+            }
+
+            getFrequencyRange(start, end) {
+                let sum = 0;
+                for (let i = start; i < end && i < this.dataArray.length; i++) {
+                    sum += this.dataArray[i];
+                }
+                return sum / (end - start);
+            }
+
+            updateMouthShape(volume, low, mid, high) {
+                const threshold = 15;
+
+                if (volume < threshold) {
+                    this.setMouthShape('closed');
+                } else {
+                    // Amplify the intensity for more dramatic movements
+                    const intensity = Math.pow((volume - threshold) / (255 - threshold), 0.7); // Power curve for more dramatic effect
+                    const freqDiff = Math.abs(high - low);
+
+                    // Add micro-movements for subtle changes
+                    if (intensity < 0.2) {
+                        // Very quiet speech - slight mouth opening
+                        this.setMouthShapeInterpolated('closed', 'open', intensity * 4);
+                    } else if (intensity > 0.8) {
+                        // Very loud speech - exaggerated movements
+                        if (low > mid * 1.3 && low > high * 1.3) {
+                            this.setMouthShapeInterpolated('round', 'extraOpen', intensity);
+                        } else if (high > mid * 1.3 && high > low * 1.3) {
+                            this.setMouthShapeInterpolated('wide', 'extraWide', intensity);
+                        } else {
+                            this.setMouthShape('extraOpen');
+                        }
+                    } else if (low > mid * 1.2 && low > high * 1.2) {
+                        // Low frequencies - rounder mouth shapes with more dramatic opening
+                        this.setMouthShapeInterpolated('round', 'extraOpen', intensity * 1.5);
+                    } else if (high > mid * 1.2 && high > low * 1.2) {
+                        // High frequencies - wider mouth shapes with more stretch
+                        this.setMouthShapeInterpolated('wide', 'extraWide', intensity * 1.5);
+                    } else if (freqDiff < 10) {
+                        // Balanced frequencies - general open mouth with more pronounced opening
+                        this.setMouthShapeInterpolated('open', 'extraOpen', intensity * 1.3);
+                    } else {
+                        // Dynamic between shapes based on frequency dominance
+                        const ratio = high / (low + 1);
+                        if (ratio > 1.5) {
+                            this.setMouthShapeInterpolated('wide', 'extraWide', intensity * 1.4);
+                        } else if (ratio < 0.7) {
+                            this.setMouthShapeInterpolated('round', 'extraOpen', intensity * 1.4);
+                        } else {
+                            this.setMouthShapeInterpolated('open', 'extraOpen', intensity * 1.2);
+                        }
+                    }
+                }
+            }
+
+            setMouthShape(shapeName) {
+                const shape = this.mouthStates[shapeName];
+                if (shape) {
+                    this.upperLip.setAttribute('d', shape.upper);
+                    this.lowerLip.setAttribute('d', shape.lower);
+                }
+            }
+
+            setMouthShapeInterpolated(shape1, shape2, factor) {
+                // Interpolate between two mouth shapes for smoother transitions
+                factor = Math.max(0, Math.min(1, factor));
+
+                const s1 = this.mouthStates[shape1];
+                const s2 = this.mouthStates[shape2];
+
+                if (!s1 || !s2) {
+                    this.setMouthShape(shape1);
+                    return;
+                }
+
+                // Simple interpolation for the Y coordinates in the path
+                const interpolateY = (y1, y2, f) => y1 + (y2 - y1) * f;
+
+                // Parse and interpolate the upper lip
+                const upperInterp = this.interpolatePath(s1.upper, s2.upper, factor);
+                const lowerInterp = this.interpolatePath(s1.lower, s2.lower, factor);
+
+                this.upperLip.setAttribute('d', upperInterp);
+                this.lowerLip.setAttribute('d', lowerInterp);
+            }
+
+            interpolatePath(path1, path2, factor) {
+                // Simple path interpolation - works for our specific path structure
+                const extractY = (path, index) => {
+                    const matches = path.match(/\d+/g);
+                    return matches ? parseInt(matches[index]) : 270;
+                };
+
+                const y1_1 = extractY(path1, 1); // First Y in path1
+                const y1_2 = extractY(path1, 3); // Second Y in path1
+                const y2_1 = extractY(path2, 1); // First Y in path2
+                const y2_2 = extractY(path2, 3); // Second Y in path2
+
+                const newY1 = Math.round(y1_1 + (y2_1 - y1_1) * factor);
+                const newY2 = Math.round(y1_2 + (y2_2 - y1_2) * factor);
+
+                // Reconstruct the path with interpolated Y values
+                if (path1.includes('265') || path1.includes('260')) {
+                    // Upper lip
+                    return `M 170 270 Q 200 ${newY1} 230 270`;
+                } else {
+                    // Lower lip
+                    return `M 170 270 Q 200 ${newY2} 230 270`;
+                }
+            }
+        }
+
+        // Initialize the lip sync face when the page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            new LipSyncFace();
+        });
+    </script>
+</body>
+</html>

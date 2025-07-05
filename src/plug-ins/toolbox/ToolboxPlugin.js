@@ -12,7 +12,7 @@ export class ToolboxPlugin extends Plugin {
   constructor() {
     super();
     this.defaultTool = "select";
-    this.toolColumns = 3;
+    this.toolColumns = 2;
     this.subscriptions = new Set();
   }
 
@@ -28,6 +28,7 @@ export class ToolboxPlugin extends Plugin {
       </div>
     `;
     const divElement = document.createElement("div");
+    divElement.style.display = 'inline-block'; /* Element will only take up as much width as needed */
     divElement.innerHTML = htmlContent;
     this.uiContainerElement.appendChild(divElement);
     this.toolListElement = divElement.querySelector("#tool-list-toolbox");
@@ -88,7 +89,7 @@ export class ToolboxPlugin extends Plugin {
       for (const [name, data] of toolsList) {
         const col = document.createElement("div");
         col.classList.add("col");
-        col.style.textAlign = "center";
+        // col.style.textAlign = "center";
         const toolElement = this.renderTool(name, data);
         col.appendChild(toolElement);
         row.appendChild(col);

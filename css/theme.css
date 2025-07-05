@@ -37,12 +37,15 @@
 
   --background: var(--base03);
   --background-highlight: var(--base02);
+
   --text: var(--base0);
   --muted: var(--base01);
   --accent: var(--cyan);
   --primary: var(--violet);
   --selected: var(--blue);
+  --active: var(--orange);
   --hover: var(--violet);
   --border: var(--base01, #586e75);
   --focus-ring: var(--blue, #268bd2);
+
 }

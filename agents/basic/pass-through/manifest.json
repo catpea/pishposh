@@ -156,96 +156,65 @@
         "id": "filterType",
         "name": "Filter Type",
         "description": "Type of filter to apply to the image",
+
         "type": "select",
-        "dataType": "text/plain",
-        "defaultValue": "blur",
-        "options": [
-          { "value": "blur", "label": "Blur" },
-          { "value": "sharpen", "label": "Sharpen" },
-          { "value": "emboss", "label": "Emboss" },
-          { "value": "edge", "label": "Edge Detection" }
-        ],
-        "validation": {
-          "required": true,
-          "enum": ["blur", "sharpen", "emboss", "edge"]
+        "defaultValue": "emboss",
+        "dataType": "application/x-string",
+
+        "attributes": {
+          "options": [
+            { "value": "blur", "text": "Blur" },
+            { "value": "sharpen", "text": "Sharpen" },
+            { "value": "emboss", "text": "Emboss" },
+            { "value": "edge", "text": "Edge Detection" }
+          ]
         },
-        "ui": {
-          "control": "dropdown",
-          "width": 120,
-          "position": { "x": 10, "y": 30 }
-        },
+
         "ports": [
           {
-            "id": "filterType_in",
-            "name": "Filter Type Input",
-            "dataType": "text/plain",
-            "mimeTypes": ["text/plain"],
-            "position": "left",
-            "color": "#FFB347",
-            "shape": "diamond"
+            "id": "filterType",
+            "name": "filterType"
           }
         ]
+
+
       },
       {
         "id": "intensity",
         "name": "Intensity",
         "description": "Filter intensity from 0.0 to 1.0",
         "type": "number",
-        "dataType": "application/x-float",
         "defaultValue": 0.5,
-        "min": 0.0,
-        "max": 1.0,
-        "step": 0.01,
-        "validation": {
-          "required": true,
-          "type": "number",
-          "minimum": 0.0,
-          "maximum": 1.0
+        "dataType": "application/x-number",
+
+        "attributes": {
+          "min": 0.0,
+          "max": 1.0,
+          "step": 0.01
         },
-        "ui": {
-          "control": "slider",
-          "width": 100,
-          "position": { "x": 10, "y": 60 },
-          "showValue": true,
-          "precision": 2
-        },
+
         "ports": [
           {
-            "id": "intensity_in",
-            "name": "Intensity Input",
-            "dataType": "application/x-float",
-            "mimeTypes": ["application/x-float", "text/plain"],
-            "position": "left",
-            "color": "#87CEEB",
-            "shape": "diamond"
+            "id": "intensity",
+            "name": "intensity"
           }
         ]
+
       },
       {
         "id": "realTimePreview",
         "name": "Real-time Preview",
         "description": "Enable real-time preview updates",
-        "type": "boolean",
+        "type": "checkbox",
         "dataType": "application/x-boolean",
         "defaultValue": true,
-        "validation": {
-          "type": "boolean"
-        },
-        "ui": {
-          "control": "checkbox",
-          "position": { "x": 10, "y": 90 }
-        },
         "ports": [
           {
-            "id": "realTimePreview_in",
-            "name": "Preview Toggle Input",
-            "dataType": "application/x-boolean",
-            "mimeTypes": ["application/x-boolean", "text/plain"],
-            "position": "left",
-            "color": "#98FB98",
-            "shape": "diamond"
+            "id": "boolean",
+            "name": "boolean"
           }
         ]
+
       }
     ],
 

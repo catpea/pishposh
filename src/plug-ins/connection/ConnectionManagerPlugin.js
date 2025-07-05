@@ -16,7 +16,7 @@ export class ConnectionManagerPlugin extends Plugin {
     this.app = app;
     this.svg = this.app.svg;
 
-    this.app.emit("registerTool", { name: "connect", data: { id: "connect-tool", icon: "bi-share", iconSelected: "bi-share-fill", description: "connect items" } });
+    this.app.emit("registerTool", { name: "connect", data: { id: "connect-tool", icon: "bi-usb-plug", iconSelected: "bi-usb-plug-fill", description: "connect items" } });
 
     this.loadStyleSheet(new URL("./style.css", import.meta.url).href);
   }

@@ -1,0 +1,49 @@
+.properties {
+  --properties-spacing: .1rem;
+  min-width: 16rem;
+  min-height: 8rem;
+  z-index: 1000;
+
+  padding: var(--properties-spacing);
+
+  background: var(--base02);
+  border: 1px solid var(--border);
+
+  margin-bottom: 1rem;
+}
+
+.properties-body {
+  color: var(--base1);
+
+  label, .field-description {
+    font-size: .75rem;
+  }
+
+  input, select  {
+    padding: .25rem .5rem;
+    font-size: .75rem;
+    border: none;
+    outline: none;
+    outline-offset: 1px;
+
+  }
+
+  .row {
+
+    padding: 0 0 var(--properties-spacing);
+  }
+  .col {
+
+    padding: 0 var(--properties-spacing) ;
+  }
+
+  .btn {
+    &.active {
+      background: var(--active);
+      box-shadow: inset 1px 1px 3px 1px rgba(0,0,0,.5);
+    }
+    margin: 0;
+  }
+
+
+}

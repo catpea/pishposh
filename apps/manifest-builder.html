@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VPL Manifest Builder</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        .json-preview {
+            xbackground-color: var(--bs-light); /* Bootstrap light color */
+            border: 1px solid var(--bs-border); /* Bootstrap border color */
+            border-radius: var(--bs-border-radius); /* Bootstrap border radius */
+            max-height: 400px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: var(--bs-font-size-sm); /* Bootstrap small font size */
+        }
+        .accordion-button:not(.collapsed) {
+            xbackground-color: var(--bs-info); /* Bootstrap info color */
+            border-color: var(--bs-info-light); /* Bootstrap light info color */
+        }
+        .port-item {
+            border: 1px solid var(--bs-border); /* Bootstrap border color */
+            border-radius: var(--bs-border-radius); /* Bootstrap border radius */
+            margin-bottom: 0.5rem;
+            padding: 0.75rem;
+            xbackground-color: var(--bs-light); /* Bootstrap light color */
+        }
+        .property-item {
+            border: 1px solid var(--bs-border); /* Bootstrap border color */
+            border-radius: var(--bs-border-radius); /* Bootstrap border radius */
+            margin-bottom: 0.5rem;
+            padding: 0.75rem;
+            xbackground-color: var(--bs-light); /* Bootstrap light color */
+        }
+        .color-preview {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: inline-block;
+            border: 1px solid var(--bs-gray); /* Bootstrap gray color */
+            margin-left: 0.5rem;
+        }
+    </style>
+
+</head>
+<body>
+    <div class="container-fluid py-4">
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="mb-0"><i class="bi bi-gear-fill"></i> Visual Programming Language Manifest Builder</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="accordion" id="manifestAccordion">
+                            <!-- Basic Information -->
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#basicInfo">
+                                        <i class="bi bi-info-circle me-2"></i> Basic Information
+                                    </button>
+                                </h2>
+                                <div id="basicInfo" class="accordion-collapse collapse show">
+                                    <div class="accordion-body">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label class="form-label">Name</label>
+                                                    <input type="text" class="form-control" id="name" placeholder="my-node">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label class="form-label">Version</label>
+                                                    <input type="text" class="form-control" id="version" placeholder="1.0.0">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Description</label>
+                                            <textarea class="form-control" id="description" rows="2" placeholder="Brief description of the node"></textarea>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label class="form-label">Category</label>
+                                                    <input type="text" class="form-control" id="category" placeholder="image-processing">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label class="form-label">Subcategory</label>
+                                                    <input type="text" class="form-control" id="subcategory" placeholder="filters">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Node Configuration -->
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#nodeConfig">
+                                        <i class="bi bi-diagram-3 me-2"></i> Node Configuration
+                                    </button>
+                                </h2>
+                                <div id="nodeConfig" class="accordion-collapse collapse">
+                                    <div class="accordion-body">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label class="form-label">Display Name</label>
+                                                    <input type="text" class="form-control" id="displayName" placeholder="My Node">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label class="form-label">Icon</label>
+                                                    <input type="text" class="form-control" id="icon" placeholder="gear">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <div class="mb-3">
+                                                    <label class="form-label">Color</label>
+                                                    <input type="color" class="form-control form-control-color" id="color" value="#4A90E2">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="mb-3">
+                                                    <label class="form-label">Width</label>
+                                                    <input type="number" class="form-control" id="width" value="200">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="mb-3">
+                                                    <label class="form-label">Height</label>
+                                                    <input type="number" class="form-control" id="height" value="120">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="resizable" checked>
+                                                    <label class="form-check-label" for="resizable">Resizable</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="collapsible" checked>
+                                                    <label class="form-check-label" for="collapsible">Collapsible</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Inputs -->
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#inputs">
+                                        <i class="bi bi-arrow-right-circle me-2"></i> Inputs <span class="badge bg-secondary ms-2" id="inputCount">0</span>
+                                    </button>
+                                </h2>
+                                <div id="inputs" class="accordion-collapse collapse">
+                                    <div class="accordion-body">
+                                        <div class="d-flex justify-content-between align-items-center mb-3">
+                                            <h6 class="mb-0">Input Ports</h6>
+                                            <button class="btn btn-sm btn-outline-primary" onclick="addInput()">
+                                                <i class="bi bi-plus"></i> Add Input
+                                            </button>
+                                        </div>
+                                        <div id="inputsList"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Outputs -->
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#outputs">
+                                        <i class="bi bi-arrow-left-circle me-2"></i> Outputs <span class="badge bg-secondary ms-2" id="outputCount">0</span>
+                                    </button>
+                                </h2>
+                                <div id="outputs" class="accordion-collapse collapse">
+                                    <div class="accordion-body">
+                                        <div class="d-flex justify-content-between align-items-center mb-3">
+                                            <h6 class="mb-0">Output Ports</h6>
+                                            <button class="btn btn-sm btn-outline-primary" onclick="addOutput()">
+                                                <i class="bi bi-plus"></i> Add Output
+                                            </button>
+                                        </div>
+                                        <div id="outputsList"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Properties -->
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#properties">
+                                        <i class="bi bi-sliders me-2"></i> Properties <span class="badge bg-secondary ms-2" id="propertyCount">0</span>
+                                    </button>
+                                </h2>
+                                <div id="properties" class="accordion-collapse collapse">
+                                    <div class="accordion-body">
+                                        <div class="d-flex justify-content-between align-items-center mb-3">
+                                            <h6 class="mb-0">Node Properties</h6>
+                                            <button class="btn btn-sm btn-outline-primary" onclick="addProperty()">
+                                                <i class="bi bi-plus"></i> Add Property
+                                            </button>
+                                        </div>
+                                        <div id="propertiesList"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Execution -->
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#execution">
+                                        <i class="bi bi-play-circle me-2"></i> Execution
+                                    </button>
+                                </h2>
+                                <div id="execution" class="accordion-collapse collapse">
+                                    <div class="accordion-body">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label class="form-label">Runtime</label>
+                                                    <select class="form-select" id="runtime">
+                                                        <option value="javascript">JavaScript</option>
+                                                        <option value="python">Python</option>
+                                                        <option value="node">Node.js</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label class="form-label">Entry Point</label>
+                                                    <input type="text" class="form-control" id="entry" placeholder="index.js">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <div class="mb-3">
+                                                    <label class="form-label">Timeout (ms)</label>
+                                                    <input type="number" class="form-control" id="timeout" value="30000">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="mb-3">
+                                                    <label class="form-label">Memory Limit</label>
+                                                    <input type="text" class="form-control" id="memoryLimit" placeholder="256MB">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="mb-3">
+                                                    <label class="form-label">CPU Limit</label>
+                                                    <input type="text" class="form-control" id="cpuLimit" placeholder="1000m">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="async" checked>
+                                            <label class="form-check-label" for="async">Async Execution</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="bi bi-code-square"></i> JSON Preview</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between mb-3">
+                            <button class="btn btn-sm btn-outline-secondary" onclick="copyToClipboard()">
+                                <i class="bi bi-clipboard"></i> Copy
+                            </button>
+                            <button class="btn btn-sm btn-outline-primary" onclick="downloadJSON()">
+                                <i class="bi bi-download"></i> Download
+                            </button>
+                        </div>
+                        <pre id="jsonPreview" class="json-preview p-3"></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Signal class
+        class Signal {
+            name = "Signal";
+            #id;
+            #value;
+            #test;
+            #same;
+            #subscribers;
+
+            constructor(value, same = (a, b) => a == b, test = (v) => v !== undefined) {
+                this.#value = value;
+                this.#test = test;
+                this.#same = same;
+                this.#subscribers = new Set();
+            }
+
+            get() {
+                return this.value;
+            }
+
+            set(v) {
+                this.value = v;
+            }
+
+            get id() {
+                if (!this.#id) this.#id = 'signal_' + Math.random().toString(36).substr(2, 9);
+                return this.#id;
+            }
+
+            get value() {
+                return this.#value;
+            }
+
+            set value(newValue) {
+                if (this.#same(this.#value, newValue)) return;
+                this.#value = newValue;
+                this.notify();
+            }
+
+            subscribe(subscriber) {
+                if (this.#test(this.#value)) subscriber(this.#value);
+                this.#subscribers.add(subscriber);
+                return () => this.#subscribers.delete(subscriber);
+            }
+
+            notify() {
+                for (const subscriber of this.#subscribers) subscriber(this.#value);
+            }
+        }
+
+        // State management
+        const manifest = new Signal({
+            name: "",
+            version: "1.0.0",
+            description: "",
+            category: "",
+            subcategory: "",
+            node: {
+                displayName: "",
+                icon: "",
+                color: "#4A90E2",
+                width: 200,
+                height: 120,
+                resizable: true,
+                collapsible: true,
+                inputs: [],
+                outputs: [],
+                properties: [],
+                execution: {
+                    runtime: "javascript",
+                    entry: "index.js",
+                    async: true,
+                    timeout: 30000,
+                    memoryLimit: "256MB",
+                    cpuLimit: "1000m"
+                }
+            }
+        });
+
+        // Update JSON preview
+        manifest.subscribe(value => {
+            document.getElementById('jsonPreview').textContent = JSON.stringify(value, null, 2);
+            document.getElementById('inputCount').textContent = value.node.inputs.length;
+            document.getElementById('outputCount').textContent = value.node.outputs.length;
+            document.getElementById('propertyCount').textContent = value.node.properties.length;
+        });
+
+        // Form binding helpers
+        function bindInput(id, path) {
+            const element = document.getElementById(id);
+            if (!element) return;
+
+            element.addEventListener('input', (e) => {
+                const value = e.target.type === 'checkbox' ? e.target.checked :
+                             e.target.type === 'number' ? parseInt(e.target.value) : e.target.value;
+                updateManifest(path, value);
+            });
+        }
+
+        function updateManifest(path, value) {
+            const current = manifest.get();
+            const keys = path.split('.');
+            let obj = current;
+
+            for (let i = 0; i < keys.length - 1; i++) {
+                if (!obj[keys[i]]) obj[keys[i]] = {};
+                obj = obj[keys[i]];
+            }
+
+            obj[keys[keys.length - 1]] = value;
+            manifest.set({...current});
+        }
+
+        // Initialize form bindings
+        document.addEventListener('DOMContentLoaded', () => {
+            bindInput('name', 'name');
+            bindInput('version', 'version');
+            bindInput('description', 'description');
+            bindInput('category', 'category');
+            bindInput('subcategory', 'subcategory');
+            bindInput('displayName', 'node.displayName');
+            bindInput('icon', 'node.icon');
+            bindInput('color', 'node.color');
+            bindInput('width', 'node.width');
+            bindInput('height', 'node.height');
+            bindInput('resizable', 'node.resizable');
+            bindInput('collapsible', 'node.collapsible');
+            bindInput('runtime', 'node.execution.runtime');
+            bindInput('entry', 'node.execution.entry');
+            bindInput('timeout', 'node.execution.timeout');
+            bindInput('memoryLimit', 'node.execution.memoryLimit');
+            bindInput('cpuLimit', 'node.execution.cpuLimit');
+            bindInput('async', 'node.execution.async');
+        });
+
+        // Input management
+        function addInput() {
+            const current = manifest.get();
+            const newInput = {
+                id: `input_${Date.now()}`,
+                name: "New Input",
+                description: "",
+                type: "required",
+                dataType: "any",
+                position: "left",
+                offset: 30,
+                color: "#FF6B6B",
+                shape: "circle"
+            };
+
+            current.node.inputs.push(newInput);
+            manifest.set({...current});
+            renderInputs();
+        }
+
+        function removeInput(index) {
+            const current = manifest.get();
+            current.node.inputs.splice(index, 1);
+            manifest.set({...current});
+            renderInputs();
+        }
+
+        function renderInputs() {
+            const container = document.getElementById('inputsList');
+            const inputs = manifest.get().node.inputs;
+
+            container.innerHTML = inputs.map((input, index) => `
+                <div class="port-item">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h6 class="mb-0">Input ${index + 1}</h6>
+                        <button class="btn btn-sm btn-outline-danger" onclick="removeInput(${index})">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-2">
+                                <label class="form-label form-label-sm">ID</label>
+                                <input type="text" class="form-control form-control-sm" value="${input.id}"
+                                       onchange="updateInputField(${index}, 'id', this.value)">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-2">
+                                <label class="form-label form-label-sm">Name</label>
+                                <input type="text" class="form-control form-control-sm" value="${input.name}"
+                                       onchange="updateInputField(${index}, 'name', this.value)">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label form-label-sm">Description</label>
+                        <input type="text" class="form-control form-control-sm" value="${input.description}"
+                               onchange="updateInputField(${index}, 'description', this.value)">
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="mb-2">
+                                <label class="form-label form-label-sm">Type</label>
+                                <select class="form-select form-select-sm" onchange="updateInputField(${index}, 'type', this.value)">
+                                    <option value="required" ${input.type === 'required' ? 'selected' : ''}>Required</option>
+                                    <option value="optional" ${input.type === 'optional' ? 'selected' : ''}>Optional</option>
+                                    <option value="trigger" ${input.type === 'trigger' ? 'selected' : ''}>Trigger</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-2">
+                                <label class="form-label form-label-sm">Data Type</label>
+                                <input type="text" class="form-control form-control-sm" value="${input.dataType}"
+                                       onchange="updateInputField(${index}, 'dataType', this.value)">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-2">
+                                <label class="form-label form-label-sm">Color</label>
+                                <input type="color" class="form-control form-control-color form-control-sm" value="${input.color}"
+                                       onchange="updateInputField(${index}, 'color', this.value)">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function updateInputField(index, field, value) {
+            const current = manifest.get();
+            current.node.inputs[index][field] = value;
+            manifest.set({...current});
+        }
+
+        // Output management
+        function addOutput() {
+            const current = manifest.get();
+            const newOutput = {
+                id: `output_${Date.now()}`,
+                name: "New Output",
+                description: "",
+                dataType: "any",
+                position: "right",
+                offset: 30,
+                color: "#FF6B6B",
+                shape: "circle"
+            };
+
+            current.node.outputs.push(newOutput);
+            manifest.set({...current});
+            renderOutputs();
+        }
+
+        function removeOutput(index) {
+            const current = manifest.get();
+            current.node.outputs.splice(index, 1);
+            manifest.set({...current});
+            renderOutputs();
+        }
+
+        function renderOutputs() {
+            const container = document.getElementById('outputsList');
+            const outputs = manifest.get().node.outputs;
+
+            container.innerHTML = outputs.map((output, index) => `
+                <div class="port-item">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h6 class="mb-0">Output ${index + 1}</h6>
+                        <button class="btn btn-sm btn-outline-danger" onclick="removeOutput(${index})">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-2">
+                                <label class="form-label form-label-sm">ID</label>
+                                <input type="text" class="form-control form-control-sm" value="${output.id}"
+                                       onchange="updateOutputField(${index}, 'id', this.value)">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-2">
+                                <label class="form-label form-label-sm">Name</label>
+                                <input type="text" class="form-control form-control-sm" value="${output.name}"
+                                       onchange="updateOutputField(${index}, 'name', this.value)">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label form-label-sm">Description</label>
+                        <input type="text" class="form-control form-control-sm" value="${output.description}"
+                               onchange="updateOutputField(${index}, 'description', this.value)">
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-2">
+                                <label class="form-label form-label-sm">Data Type</label>
+                                <input type="text" class="form-control form-control-sm" value="${output.dataType}"
+                                       onchange="updateOutputField(${index}, 'dataType', this.value)">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-2">
+                                <label class="form-label form-label-sm">Color</label>
+                                <input type="color" class="form-control form-control-color form-control-sm" value="${output.color}"
+                                       onchange="updateOutputField(${index}, 'color', this.value)">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function updateOutputField(index, field, value) {
+            const current = manifest.get();
+            current.node.outputs[index][field] = value;
+            manifest.set({...current});
+        }
+
+        // Property management
+        function addProperty() {
+            const current = manifest.get();
+            const newProperty = {
+                id: `property_${Date.now()}`,
+                name: "New Property",
+                description: "",
+                type: "text",
+                dataType: "text/plain",
+                defaultValue: "",
+                ui: {
+                    control: "input",
+                    position: { x: 10, y: 30 }
+                }
+            };
+
+            current.node.properties.push(newProperty);
+            manifest.set({...current});
+            renderProperties();
+        }
+
+        function removeProperty(index) {
+            const current = manifest.get();
+            current.node.properties.splice(index, 1);
+            manifest.set({...current});
+            renderProperties();
+        }
+
+        function renderProperties() {
+            const container = document.getElementById('propertiesList');
+            const properties = manifest.get().node.properties;
+
+            container.innerHTML = properties.map((property, index) => `
+                <div class="property-item">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h6 class="mb-0">Property ${index + 1}</h6>
+                        <button class="btn btn-sm btn-outline-danger" onclick="removeProperty(${index})">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-2">
+                                <label class="form-label form-label-sm">ID</label>
+                                <input type="text" class="form-control form-control-sm" value="${property.id}"
+                                       onchange="updatePropertyField(${index}, 'id', this.value)">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-2">
+                                <label class="form-label form-label-sm">Name</label>
+                                <input type="text" class="form-control form-control-sm" value="${property.name}"
+                                       onchange="updatePropertyField(${index}, 'name', this.value)">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label form-label-sm">Description</label>
+                        <input type="text" class="form-control form-control-sm" value="${property.description}"
+                               onchange="updatePropertyField(${index}, 'description', this.value)">
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-2">
+                                <label class="form-label form-label-sm">Type</label>
+                                <select class="form-select form-select-sm" onchange="updatePropertyField(${index}, 'type', this.value)">
+                                    <option value="text" ${property.type === 'text' ? 'selected' : ''}>Text</option>
+                                    <option value="number" ${property.type === 'number' ? 'selected' : ''}>Number</option>
+                                    <option value="boolean" ${property.type === 'boolean' ? 'selected' : ''}>Boolean</option>
+                                    <option value="select" ${property.type === 'select' ? 'selected' : ''}>Select</option>
+                                    <option value="color" ${property.type === 'color' ? 'selected' : ''}>Color</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-2">
+                                <label class="form-label form-label-sm">Default Value</label>
+                                <input type="text" class="form-control form-control-sm" value="${property.defaultValue}"
+                                       onchange="updatePropertyField(${index}, 'defaultValue', this.value)">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function updatePropertyField(index, field, value) {
+            const current = manifest.get();
+            current.node.properties[index][field] = value;
+            manifest.set({...current});
+        }
+
+        // Utility functions
+        function copyToClipboard() {
+            const text = document.getElementById('jsonPreview').textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                alert('JSON copied to clipboard!');
+            });
+        }
+
+        function downloadJSON() {
+            const text = document.getElementById('jsonPreview').textContent;
+            const blob = new Blob([text], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${manifest.get().name || 'manifest'}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // Initialize renders
+        document.addEventListener('DOMContentLoaded', () => {
+            renderInputs();
+            renderOutputs();
+            renderProperties();
+
+            // Load example data
+            setTimeout(() => {
+                const exampleData = {
+                    name: "image-filter",
+                    version: "1.2.3",
+                    description: "Applies various image filters with real-time preview and adjustable parameters",
+                    category: "image-processing",
+                    subcategory: "filters",
+                    node: {
+                        displayName: "Image Filter",
+                        icon: "filter",
+                        color: "#4A90E2",
+                        width: 200,
+                        height: 120,
+                        resizable: true,
+                        collapsible: true,
+                        inputs: [
+                            {
+                                id: "image",
+                                name: "Image Input",
+                                description: "Source image to apply filter to",
+                                type: "required",
+                                dataType: "image/*",
+                                position: "left",
+                                offset: 30,
+                                color: "#FF6B6B",
+                                shape: "circle"
+                            },
+                            {
+                                id: "mask",
+                                name: "Mask",
+                                description: "Optional mask to limit filter application area",
+                                type: "optional",
+                                dataType: "image/mask",
+                                position: "left",
+                                offset: 70,
+                                color: "#4ECDC4",
+                                shape: "square"
+                            }
+                        ],
+                        outputs: [
+                            {
+                                id: "output",
+                                name: "Filtered Image",
+                                description: "Processed image with applied filter",
+                                dataType: "image/*",
+                                position: "right",
+                                offset: 30,
+                                color: "#FF6B6B",
+                                shape: "circle"
+                            },
+                            {
+                                id: "preview",
+                                name: "Preview",
+                                description: "Low-resolution preview for real-time feedback",
+                                dataType: "image/preview",
+                                position: "right",
+                                offset: 70,
+                                color: "#FFA07A",
+                                shape: "circle"
+                            }
+                        ],
+                        properties: [
+                            {
+                                id: "filterType",
+                                name: "Filter Type",
+                                description: "Type of filter to apply to the image",
+                                type: "select",
+                                dataType: "text/plain",
+                                defaultValue: "blur",
+                                ui: {
+                                    control: "dropdown",
+                                    position: { x: 10, y: 30 }
+                                }
+                            },
+                            {
+                                id: "intensity",
+                                name: "Intensity",
+                                description: "Filter intensity from 0.0 to 1.0",
+                                type: "number",
+                                dataType: "application/x-float",
+                                defaultValue: 0.5,
+                                ui: {
+                                    control: "slider",
+                                    position: { x: 10, y: 60 }
+                                }
+                            }
+                        ],
+                        execution: {
+                            runtime: "javascript",
+                            entry: "index.js",
+                            async: true,
+                            timeout: 30000,
+                            memoryLimit: "256MB",
+                            cpuLimit: "1000m"
+                        }
+                    }
+                };
+
+                // Load example data into form
+                document.getElementById('name').value = exampleData.name;
+                document.getElementById('version').value = exampleData.version;
+                document.getElementById('description').value = exampleData.description;
+                document.getElementById('category').value = exampleData.category;
+                document.getElementById('subcategory').value = exampleData.subcategory;
+                document.getElementById('displayName').value = exampleData.node.displayName;
+                document.getElementById('icon').value = exampleData.node.icon;
+                document.getElementById('color').value = exampleData.node.color;
+                document.getElementById('width').value = exampleData.node.width;
+                document.getElementById('height').value = exampleData.node.height;
+                document.getElementById('resizable').checked = exampleData.node.resizable;
+                document.getElementById('collapsible').checked = exampleData.node.collapsible;
+                document.getElementById('runtime').value = exampleData.node.execution.runtime;
+                document.getElementById('entry').value = exampleData.node.execution.entry;
+                document.getElementById('timeout').value = exampleData.node.execution.timeout;
+                document.getElementById('memoryLimit').value = exampleData.node.execution.memoryLimit;
+                document.getElementById('cpuLimit').value = exampleData.node.execution.cpuLimit;
+                document.getElementById('async').checked = exampleData.node.execution.async;
+
+                // Set the manifest data
+                manifest.set(exampleData);
+                renderInputs();
+                renderOutputs();
+                renderProperties();
+            }, 500);
+        });
+    </script>
+</body>
+</html>

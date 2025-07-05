@@ -1,0 +1,394 @@
+<!doctype html>
+<html lang="en" data-bs-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍥</text></svg>">
+    <title>Package.json Editor</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" />
+    <script type="importmap">
+      {
+        "imports": {}
+      }
+    </script>
+  </head>
+  <body>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js" integrity="sha384-j1CDi7MgGQ12Z7Qab0qlWQ/Qqz24Gc6BM0thvEMVjHnfYGF0rmFCozFSxQBxwHKO" crossorigin="anonymous"></script>
+  <script type="module">
+    import { html, Signal } from 'https://cdn.jsdelivr.net/npm/luminiferous';
+
+    // Helper function for random selection
+    function oneOf(arr) {
+      return arr[Math.floor(Math.random() * arr.length)];
+    }
+
+    // Package data as signals
+    const packageData = {
+      name: new Signal("basic/pass-through"),
+      version: new Signal("1.2.3"),
+      description: new Signal("Applies various image filters with real-time preview and adjustable parameters"),
+      author: {
+        name: new Signal("John Doe"),
+        email: new Signal("john@example.com"),
+        url: new Signal("https://example.com")
+      },
+      license: new Signal("MIT"),
+      repository: {
+        type: new Signal("git"),
+        url: new Signal("https://github.com/myorg/image-filter-node.git")
+      },
+      keywords: new Signal(["image", "filter", "processing", "graphics"]),
+      category: new Signal("image-processing"),
+      subcategory: new Signal("filters")
+    };
+
+    // Visual state
+    const appState = {
+      activeTab: new Signal("basic"),
+      isDirty: new Signal(false),
+      lastSaved: new Signal(new Date()),
+      animatedIcon: new Signal("bi-box-seam")
+    };
+
+    // Animate icon
+    setInterval(() => {
+      appState.animatedIcon.value = oneOf(['bi-box-seam', 'bi-boxes', 'bi-archive', 'bi-file-earmark-code']);
+    }, 2000);
+
+    // Track changes
+    Object.values(packageData).forEach(signal => {
+      if (signal instanceof Signal) {
+        signal.subscribe(() => appState.isDirty.value = true);
+      }
+    });
+
+    // Helper function to create form fields
+    function createField(label, signal, type = "text", options = {}) {
+
+      const id = `field-${label.toLowerCase().replace(/\s+/g, '-')}`;
+      const {placeholder = " ", help = "", required = false, rows = 3} = options;
+
+      if (type === "textarea") {
+        return html`
+          <div class="mb-3">
+            <label for="${id}" class="form-label">${label} ${required ? html`<span class="text-danger">*</span>` : ''}</label>
+            <textarea class="form-control" id="${id}" rows="${rows}" placeholder="${placeholder}" value=${signal} oninput="${(e) => signal.value = e.target.value}">
+            </textarea>
+            ${help ? html`<div class="form-text">${help}</div>` : ''}
+          </div>
+        `;
+      }
+
+      if (type === "select") {
+        return html`
+          <div class="mb-3">
+            <label for="${id}" class="form-label">${label} ${required ? html`<span class="text-danger">*</span>` : ''}</label>
+            <select class="form-select" id="${id}" value=${signal} oninput="${(e) => signal.value = e.target.value}">
+              ${options.choices.map(choice => html`
+                <option value="${choice.value}" selected=${signal.value === choice.value ? 'selected' : ''}>${choice.label}</option>
+              `)}
+            </select>
+            ${help ? html`<div class="form-text">${help}</div>` : ''}
+          </div>
+        `;
+      }
+
+      return html`
+        <div class="mb-3">
+          <label for="${id}" class="form-label">${label} ${required ? html`<span class="text-danger">*</span>` : ''}</label>
+          <input type="${type}" class="form-control" id="${id}" placeholder="${placeholder}" value=${signal} oninput="${(e) => signal.value = e.target.value}">
+          ${help ? html`<div class="form-text">${help}</div>` : ''}
+        </div>
+      `;
+    }
+
+    // Keywords manager
+    function keywordsManager() {
+      const newKeyword = new Signal("");
+
+      return html`
+        <div class="mb-3">
+          <label class="form-label">Keywords</label>
+          <div class="d-flex gap-2 mb-2">
+            <input type="text" class="form-control" placeholder="Add keyword"
+                   ${{
+                     value: newKeyword,
+                     oninput: (e) => newKeyword.value = e.target.value,
+                     onkeydown: (e) => {
+                       if (e.key === 'Enter' && newKeyword.value.trim()) {
+                         packageData.keywords.value = [...packageData.keywords.value, newKeyword.value.trim()];
+                         newKeyword.value = "";
+                         e.preventDefault();
+                       }
+                     }
+                   }}>
+            <button type="button" class="btn btn-outline-primary"
+                    ${{
+                      onclick: () => {
+                        if (newKeyword.value.trim()) {
+                          packageData.keywords.value = [...packageData.keywords.value, newKeyword.value.trim()];
+                          newKeyword.value = "";
+                        }
+                      }
+                    }}>
+              <i class="bi bi-plus"></i>
+            </button>
+          </div>
+          <div class="d-flex flex-wrap gap-1">
+            ${packageData.keywords.value.map((keyword, index) => html`
+              <span class="badge bg-secondary d-flex align-items-center gap-1">
+                ${keyword}
+                <button type="button" class="btn-close btn-close-white"
+                        style="font-size: 0.6em;"
+                        ${{
+                          onclick: () => {
+                            packageData.keywords.value = packageData.keywords.value.filter((_, i) => i !== index);
+                          }
+                        }}></button>
+              </span>
+            `)}
+          </div>
+        </div>
+      `;
+    }
+
+    // Navigation tabs
+    function createTabs() {
+      const tabs = [
+        { id: "basic", label: "Basic Info", icon: "bi-info-circle" },
+        { id: "author", label: "Author", icon: "bi-person" },
+        { id: "repository", label: "Repository", icon: "bi-github" },
+        { id: "advanced", label: "Advanced", icon: "bi-gear" }
+      ];
+
+      return html`
+        <ul class="nav nav-tabs mb-4">
+          ${tabs.map(tab => html`
+            <li class="nav-item">
+              <button class="${['nav-link', (appState.activeTab.value === tab.id ? 'active' : 'inactive') ]}" foo="foo" onclick=${function(){appState.activeTab.value=tab.id}}>
+
+                <i class="${tab.icon}"></i> ${tab.label}
+              </button>
+            </li>
+          `)}
+        </ul>
+      `;
+    }
+
+    // Tab content
+    function createTabContent() {
+      const licenseOptions = [
+        { value: "MIT", label: "MIT" },
+        { value: "Apache-2.0", label: "Apache 2.0" },
+        { value: "GPL-3.0", label: "GPL 3.0" },
+        { value: "BSD-3-Clause", label: "BSD 3-Clause" },
+        { value: "ISC", label: "ISC" }
+      ];
+
+      switch (appState.activeTab.value) {
+        case "basic":
+          return html`
+            <div class="row">
+              <div class="col-md-6">
+                ${createField("Package Name", packageData.name, "text", {
+                  placeholder: "e.g., @myorg/package-name",
+                  help: "The name of your package",
+                  required: true
+                })}
+                ${createField("Version", packageData.version, "text", {
+                  placeholder: "e.g., 1.0.0",
+                  help: "Semantic version number",
+                  required: true
+                })}
+                ${createField("License", packageData.license, "select", {
+                  choices: licenseOptions,
+                  help: "Choose a license for your package"
+                })}
+              </div>
+              <div class="col-md-6">
+                ${createField("Description", packageData.description, "textarea", {
+                  placeholder: "Brief description of what your package does",
+                  help: "This will appear in package listings",
+                  required: true
+                })}
+                ${createField("Category", packageData.category, "text", {
+                  placeholder: "e.g., image-processing"
+                })}
+                ${createField("Subcategory", packageData.subcategory, "text", {
+                  placeholder: "e.g., filters"
+                })}
+              </div>
+            </div>
+            ${keywordsManager()}
+          `;
+
+        case "author":
+          return html`
+            <div class="row">
+              <div class="col-md-6">
+                ${createField("Author Name", packageData.author.name, "text", {
+                  placeholder: "Your full name",
+                  required: true
+                })}
+                ${createField("Author Email", packageData.author.email, "email", {
+                  placeholder: "your.email@example.com"
+                })}
+              </div>
+              <div class="col-md-6">
+                ${createField("Author URL", packageData.author.url, "url", {
+                  placeholder: "https://yourwebsite.com",
+                  help: "Your personal website or portfolio"
+                })}
+              </div>
+            </div>
+          `;
+
+        case "repository":
+          return html`
+            <div class="row">
+              <div class="col-md-6">
+                ${createField("Repository Type", packageData.repository.type, "select", {
+                  choices: [
+                    { value: "git", label: "Git" },
+                    { value: "svn", label: "SVN" },
+                    { value: "hg", label: "Mercurial" }
+                  ]
+                })}
+              </div>
+              <div class="col-md-6">
+                ${createField("Repository URL", packageData.repository.url, "url", {
+                  placeholder: "https://github.com/username/repo.git",
+                  help: "The repository URL where your code is hosted"
+                })}
+              </div>
+            </div>
+          `;
+
+        case "advanced":
+          return html`
+            <div class="alert alert-info">
+              <i class="bi bi-info-circle"></i>
+              Advanced configuration options would go here. This could include:
+              <ul class="mb-0 mt-2">
+                <li>Engine requirements</li>
+                <li>Peer dependencies</li>
+                <li>Build scripts</li>
+                <li>File configurations</li>
+              </ul>
+            </div>
+          `;
+
+        default:
+          return html`<div>Select a tab to edit package information</div>`;
+      }
+    }
+
+    // JSON preview
+    function createJsonPreview() {
+      const jsonOutput = {
+        name: packageData.name.value,
+        version: packageData.version.value,
+        description: packageData.description.value,
+        author: {
+          name: packageData.author.name.value,
+          email: packageData.author.email.value,
+          url: packageData.author.url.value
+        },
+        license: packageData.license.value,
+        repository: {
+          type: packageData.repository.type.value,
+          url: packageData.repository.url.value
+        },
+        keywords: packageData.keywords.value,
+        category: packageData.category.value,
+        subcategory: packageData.subcategory.value
+      };
+
+      return html`
+        <div class="position-sticky" style="top: 2rem;">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="mb-0">
+              <i class="bi bi-file-earmark-code"></i> package.json Preview
+            </h5>
+            <div class="d-flex gap-2">
+              <button class="btn btn-outline-primary btn-sm"
+                      ${{
+                        onclick: () => {
+                          navigator.clipboard.writeText(JSON.stringify(jsonOutput, null, 2));
+                        }
+                      }}>
+                <i class="bi bi-clipboard"></i> Copy
+              </button>
+              <button class="btn btn-primary btn-sm"
+                      ${{
+                        onclick: () => {
+                          const blob = new Blob([JSON.stringify(jsonOutput, null, 2)], { type: 'application/json' });
+                          const url = URL.createObjectURL(blob);
+                          const a = document.createElement('a');
+                          a.href = url;
+                          a.download = 'package.json';
+                          a.click();
+                          URL.revokeObjectURL(url);
+                          appState.isDirty.value = false;
+                          appState.lastSaved.value = new Date();
+                        }
+                      }}>
+                <i class="bi bi-download"></i> Download
+              </button>
+            </div>
+          </div>
+          <div class="border rounded p-3 bg-body-tertiary">
+            <pre class="mb-0" style="font-size: 0.8em; max-height: 60vh; overflow-y: auto;">
+              <code>${JSON.stringify(jsonOutput, null, 2)}</code>
+            </pre>
+          </div>
+          <div class="mt-2 text-muted small">
+            ${appState.isDirty.value ? html`
+              <i class="bi bi-circle-fill text-warning"></i> Unsaved changes
+            ` : html`
+              <i class="bi bi-check-circle-fill text-success"></i> Saved ${appState.lastSaved.value.toLocaleTimeString()}
+            `}
+          </div>
+        </div>
+      `;
+    }
+
+    // Main application
+    const app = html`
+      <div class="container-fluid py-4">
+        <div class="row">
+          <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+              <h1 class="display-6">
+                <i class="${appState.animatedIcon}"></i>
+                Package.json Editor (<small>${packageData.version}</small>)
+              </h1>
+              <div class="badge bg-primary">
+                Powered by Luminiferous Signals
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-lg-8">
+            <div class="card">
+              <div class="card-body">
+                ${createTabs()}
+                ${createTabContent()}
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-4">
+            ${createJsonPreview()}
+          </div>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(app);
+  </script>
+  </body>
+</html>

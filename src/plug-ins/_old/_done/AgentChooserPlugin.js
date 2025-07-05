@@ -83,5 +83,9 @@ export class AgentChooserPlugin {
       // this will trigger this.graph.on('nodeAdded...
       const node = this.app.graph.addNode({ x: snapped.x, y: snapped.y, type: agentType, label: agentName });
     });
+
+
+
+
   }
 }
