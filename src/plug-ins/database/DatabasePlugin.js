@@ -62,7 +62,10 @@ export class DatabasePlugin {
     // deferredEmit is part of the local EventEmitter system
     // NOTE: a connection cannot be restored until the nodes it connects are loaded!
     // NOTE: fromId, toId are just from the connection data in the Map
-    const restoreConnectionOrchestrator = ({fromId, toId}) => {
+    const restoreConnectionOrchestrator = async ({id, fromId, toId}) => {
+
+      if(!this.records.ready) await records.once('ready');
+      if(!records.has(id)) records.set(id, {}); // the record was not in database, set a blank object and bail
 
       const expectData = new Map();
       expectData.set(fromId, this.portInstances.has(fromId));

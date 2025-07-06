@@ -2,307 +2,80 @@
   "id": "basic/connection",
   "version": "1.2.3",
   "description": "Applies various image filters with real-time preview and adjustable parameters",
-  "author": {
-    "name": "John Doe",
-    "email": "john@example.com",
-    "url": "https://example.com"
-  },
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/myorg/image-filter-node.git"
-  },
-  "keywords": ["image", "filter", "processing", "graphics"],
-  "category": "image-processing",
-  "subcategory": "filters",
 
   "node": {
-    "id": "image-filter",
-    "displayName": "Image Filter",
+    "id": "system-connection",
+    "displayName": "Connection",
     "icon": "filter",
     "color": "#4A90E2",
     "backgroundColor": "#F5F7FA",
     "borderColor": "#E1E8ED",
-    "width": 200,
-    "height": 120,
-    "resizable": true,
-    "collapsible": true,
-    "tags": ["image", "filter", "effect"],
-
-    "documentation": {
-      "description": "Advanced image filtering node with support for multiple filter types and real-time preview",
-      "examples": [
-        {
-          "title": "Basic Blur Effect",
-          "description": "Apply a simple blur filter to an input image",
-          "config": {
-            "filterType": "blur",
-            "intensity": 0.5
-          }
-        }
-      ],
-      "url": "https://docs.example.com/nodes/image-filter"
-    },
-
-    "execution": {
-      "runtime": "javascript",
-      "entry": "index.js",
-      "async": true,
-      "timeout": 30000,
-      "memoryLimit": "256MB",
-      "cpuLimit": "1000m"
-    },
-
-    "inputs": [
-      {
-        "id": "image",
-        "name": "Image Input",
-        "description": "Source image to apply filter to",
-        "type": "required",
-        "dataType": "image/*",
-        "mimeTypes": ["image/png", "image/jpeg", "image/webp", "image/svg+xml"],
-        "position": "left",
-        "offset": 30,
-        "color": "#FF6B6B",
-        "shape": "circle",
-        "allowMultiple": false,
-        "defaultValue": null,
-        "validation": {
-          "required": true,
-          "maxSize": "10MB",
-          "minResolution": "1x1",
-          "maxResolution": "8192x8192"
-        }
-      },
-      {
-        "id": "mask",
-        "name": "Mask",
-        "description": "Optional mask to limit filter application area",
-        "type": "optional",
-        "dataType": "image/mask",
-        "mimeTypes": ["image/png", "image/jpeg"],
-        "position": "left",
-        "offset": 70,
-        "color": "#4ECDC4",
-        "shape": "square",
-        "allowMultiple": false,
-        "defaultValue": null,
-        "validation": {
-          "required": false,
-          "channels": ["grayscale", "alpha"]
-        }
-      },
-      {
-        "id": "trigger",
-        "name": "Process",
-        "description": "Trigger to start processing",
-        "type": "trigger",
-        "dataType": "application/x-trigger",
-        "mimeTypes": ["application/x-trigger"],
-        "position": "left",
-        "offset": 110,
-        "color": "#95E1D3",
-        "shape": "triangle",
-        "allowMultiple": false
-      }
-    ],
-
-    "outputs": [
-      {
-        "id": "output",
-        "name": "Filtered Image",
-        "description": "Processed image with applied filter",
-        "dataType": "image/*",
-        "mimeTypes": ["image/png", "image/jpeg", "image/webp"],
-        "position": "right",
-        "offset": 30,
-        "color": "#FF6B6B",
-        "shape": "circle",
-        "metadata": {
-          "preserveFormat": true,
-          "quality": "original"
-        }
-      },
-      {
-        "id": "preview",
-        "name": "Preview",
-        "description": "Low-resolution preview for real-time feedback",
-        "dataType": "image/preview",
-        "mimeTypes": ["image/jpeg"],
-        "position": "right",
-        "offset": 70,
-        "color": "#FFA07A",
-        "shape": "circle",
-        "metadata": {
-          "maxResolution": "512x512",
-          "quality": 0.7
-        }
-      },
-      {
-        "id": "debug",
-        "name": "Debug Info",
-        "description": "Processing statistics and debug information",
-        "dataType": "application/json",
-        "mimeTypes": ["application/json"],
-        "position": "right",
-        "offset": 110,
-        "color": "#DDA0DD",
-        "shape": "hexagon"
-      }
-    ],
 
     "properties": [
       {
-        "id": "filterType",
-        "name": "Filter Type",
-        "description": "Type of filter to apply to the image",
-        "type": "select",
-        "dataType": "text/plain",
-        "defaultValue": "blur",
-        "options": [
-          { "value": "blur", "label": "Blur" },
-          { "value": "sharpen", "label": "Sharpen" },
-          { "value": "emboss", "label": "Emboss" },
-          { "value": "edge", "label": "Edge Detection" }
-        ],
-        "validation": {
-          "required": true,
-          "enum": ["blur", "sharpen", "emboss", "edge"]
-        },
-        "ui": {
-          "control": "dropdown",
-          "width": 120,
-          "position": { "x": 10, "y": 30 }
-        },
-        "ports": [
-          {
-            "id": "filterType_in",
-            "name": "Filter Type Input",
-            "dataType": "text/plain",
-            "mimeTypes": ["text/plain"],
-            "position": "left",
-            "color": "#FFB347",
-            "shape": "diamond"
-          }
-        ]
+        "id": "fromStationId",
+        "type": "hidden",
+        "name": "From Station Id",
+        "description": "The unique identifier for the starting station in the connection.",
+        "defaultValue": ""
       },
       {
-        "id": "intensity",
-        "name": "Intensity",
-        "description": "Filter intensity from 0.0 to 1.0",
-        "type": "number",
-        "dataType": "application/x-float",
-        "defaultValue": 0.5,
-        "min": 0.0,
-        "max": 1.0,
-        "step": 0.01,
-        "validation": {
-          "required": true,
-          "type": "number",
-          "minimum": 0.0,
-          "maximum": 1.0
-        },
-        "ui": {
-          "control": "slider",
-          "width": 100,
-          "position": { "x": 10, "y": 60 },
-          "showValue": true,
-          "precision": 2
-        },
-        "ports": [
-          {
-            "id": "intensity_in",
-            "name": "Intensity Input",
-            "dataType": "application/x-float",
-            "mimeTypes": ["application/x-float", "text/plain"],
-            "position": "left",
-            "color": "#87CEEB",
-            "shape": "diamond"
-          }
-        ]
+        "id": "toStationId",
+        "type": "hidden",
+        "name": "To Station Id",
+        "description": "The unique identifier for the destination station in the connection.",
+        "defaultValue": ""
       },
       {
-        "id": "realTimePreview",
-        "name": "Real-time Preview",
-        "description": "Enable real-time preview updates",
-        "type": "boolean",
-        "dataType": "application/x-boolean",
-        "defaultValue": true,
-        "validation": {
-          "type": "boolean"
-        },
-        "ui": {
-          "control": "checkbox",
-          "position": { "x": 10, "y": 90 }
-        },
-        "ports": [
-          {
-            "id": "realTimePreview_in",
-            "name": "Preview Toggle Input",
-            "dataType": "application/x-boolean",
-            "mimeTypes": ["application/x-boolean", "text/plain"],
-            "position": "left",
-            "color": "#98FB98",
-            "shape": "diamond"
-          }
-        ]
+        "id": "fromId",
+        "type": "hidden",
+        "name": "From Id",
+        "description": "The identifier for the node from which the connection originates.",
+        "defaultValue": ""
+      },
+      {
+        "id": "toId",
+        "type": "hidden",
+        "name": "To Id",
+        "description": "The identifier for the node to which the connection leads.",
+        "defaultValue": ""
+      },
+      {
+        "id": "startLabel",
+        "type": "text",
+        "name": "Start Label",
+        "description": "A label that describes the starting point of the connection.",
+        "defaultValue": ""
+      },
+      {
+        "id": "centerLabel",
+        "type": "text",
+        "name": "Center Label",
+        "description": "A label that represents the connection itself, typically displayed in the center.",
+        "defaultValue": ""
+      },
+      {
+        "id": "endLabel",
+        "type": "text",
+        "name": "End Label",
+        "description": "A label that describes the endpoint of the connection.",
+        "defaultValue": ""
+      },
+      {
+        "id": "agentType",
+        "type": "hidden",
+        "name": "Agent Type",
+        "description": "The type of agent responsible for managing the connection, which may define its behavior.",
+        "defaultValue": ""
+      },
+      {
+        "id": "color",
+        "type": "color",
+        "name": "Line Color",
+        "description": "The color of the line representing the connection, used for visual distinction.",
+        "defaultValue": "orange"
       }
     ],
-
-    "events": [
-      {
-        "id": "onProcessStart",
-        "name": "Processing Started",
-        "description": "Fired when image processing begins",
-        "dataType": "application/json",
-        "payload": {
-          "timestamp": "number",
-          "inputSize": "object",
-          "filterType": "string"
-        }
-      },
-      {
-        "id": "onProcessComplete",
-        "name": "Processing Complete",
-        "description": "Fired when image processing finishes",
-        "dataType": "application/json",
-        "payload": {
-          "timestamp": "number",
-          "processingTime": "number",
-          "outputSize": "object"
-        }
-      },
-      {
-        "id": "onError",
-        "name": "Processing Error",
-        "description": "Fired when an error occurs during processing",
-        "dataType": "application/json",
-        "payload": {
-          "timestamp": "number",
-          "error": "string",
-          "errorCode": "string"
-        }
-      }
-    ],
-
-    "dependencies": {
-      "runtime": {
-        "canvas-api": "^2.0.0",
-        "image-processing": "^1.5.0"
-      },
-      "peer": {
-        "visual-programming-engine": ">=3.0.0"
-      }
-    },
-
-    "capabilities": {
-      "streaming": true,
-      "parallelProcessing": false,
-      "webWorker": true,
-      "gpu": false,
-      "fileSystem": false,
-      "network": false
-    },
 
     "metadata": {
       "nodeVersion": "2.1.0",
@@ -313,18 +86,8 @@
       "experimental": false,
       "stability": "stable"
     }
-  },
 
-  "files": {
-    "main": "index.js",
-    "types": "types/index.d.ts",
-    "icon": "assets/icon.svg",
-    "preview": "assets/preview.png",
-    "documentation": "README.md"
-  },
-
-  "engines": {
-    "visualProgramming": ">=3.0.0",
-    "node": ">=16.0.0"
   }
+
+
 }

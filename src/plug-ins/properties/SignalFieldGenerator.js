@@ -8,15 +8,19 @@ export class SignalFieldGenerator {
   generateFields(specifications) {
     const containers = [];
     const signals = [];
+    const unsubscriptions = [];
 
     specifications.forEach((specification, index) => {
-      const [container, signal] = this.createField(specification);
 
+      if(specification.type == 'hidden') return;
+
+      const [container, signal, unsubscribe] = this.createField(specification);
       containers.push(container);
       signals.push(signal);
+      unsubscriptions.push(...unsubscribe);
     });
 
-    return [containers, signals];
+    return [containers, signals, unsubscriptions];
   }
 
   createField(field) {
@@ -44,7 +48,7 @@ export class SignalFieldGenerator {
     }
 
     // Create the appropriate field type
-    const [element, signal] = this.createElementByType(fieldContainer, type, name, attributes);
+    const [element, signal, unsubscribe] = this.createElementByType(fieldContainer, type, name, attributes);
 
     // Add description if provided
     if (description) {
@@ -54,7 +58,7 @@ export class SignalFieldGenerator {
       fieldContainer.appendChild(descriptionElement);
     }
 
-    return [fieldContainer, signal];
+    return [fieldContainer, signal, unsubscribe];
   }
 
   createElementByType(fieldContainer, type, name, attributes) {
@@ -97,12 +101,11 @@ export class SignalFieldGenerator {
       signal.value = event.target.value;
     });
 
-    this.setupFieldCleanup(fieldContainer, element, unsubscribe);
     this.setBasicAttributes(element, name);
     this.applyAttributes(element, attributes);
 
     fieldContainer.appendChild(element);
-    return [element, signal];
+    return [element, signal, [unsubscribe]];
   }
 
   createSelectField(fieldContainer, name, attributes) {
@@ -118,12 +121,11 @@ export class SignalFieldGenerator {
       signal.value = event.target.value;
     });
 
-    this.setupFieldCleanup(fieldContainer, element, unsubscribe);
     this.setBasicAttributes(element, name);
     this.applyAttributes(element, attributes);
 
     fieldContainer.appendChild(element);
-    return [element, signal];
+    return [element, signal, [unsubscribe]];
   }
 
   createCheckboxField(fieldContainer, name, attributes) {
@@ -145,12 +147,11 @@ export class SignalFieldGenerator {
       signal.value = event.target.checked;
     });
 
-    this.setupFieldCleanup(fieldContainer, element, unsubscribe);
     this.setBasicAttributes(element, name);
     this.applyAttributes(element, attributes);
 
     fieldContainer.appendChild(element);
-    return [element, signal];
+    return [element, signal, [unsubscribe]];
   }
 
   createRadioField(fieldContainer, name, attributes) {
@@ -172,12 +173,11 @@ export class SignalFieldGenerator {
       signal.value = event.target.checked;
     });
 
-    this.setupFieldCleanup(fieldContainer, element, unsubscribe);
     this.setBasicAttributes(element, name);
     this.applyAttributes(element, attributes);
 
     fieldContainer.appendChild(element);
-    return [element, signal];
+    return [element, signal, [unsubscribe]];
   }
 
   createHiddenField(fieldContainer, name, attributes) {
@@ -193,12 +193,11 @@ export class SignalFieldGenerator {
       signal.value = event.target.value;
     });
 
-    this.setupFieldCleanup(fieldContainer, element, unsubscribe);
     this.setBasicAttributes(element, name);
     this.applyAttributes(element, attributes);
 
     fieldContainer.appendChild(element);
-    return [element, signal];
+    return [element, signal, [unsubscribe]];
   }
 
   // createSubmitField(fieldContainer, name, attributes) {
@@ -210,7 +209,6 @@ export class SignalFieldGenerator {
 
   //   const unsubscribe = signal.subscribe(v => element.value = v);
 
-  //   this.setupFieldCleanup(fieldContainer, element, unsubscribe);
   //   this.setBasicAttributes(element, name);
   //   this.applyAttributes(element, attributes);
 
@@ -227,7 +225,6 @@ export class SignalFieldGenerator {
 
   //   const unsubscribe = signal.subscribe(v => element.value = v);
 
-  //   this.setupFieldCleanup(fieldContainer, element, unsubscribe);
   //   this.setBasicAttributes(element, name);
   //   this.applyAttributes(element, attributes);
 
@@ -244,7 +241,6 @@ export class SignalFieldGenerator {
 
   //   const unsubscribe = signal.subscribe(v => element.value = v);
 
-  //   this.setupFieldCleanup(fieldContainer, element, unsubscribe);
   //   this.setBasicAttributes(element, name);
   //   this.applyAttributes(element, attributes);
 
@@ -259,21 +255,17 @@ export class SignalFieldGenerator {
     const signal = new Signal();
     signal.identity = name;
 
-    const unsubscribe = signal.subscribe(v => {
-      // File inputs are read-only from the value perspective
-      // We can't programmatically set files for security reasons
-    });
+    // re: unsubscribe > File inputs are read-only from the value perspective. We can't programmatically set files for security reasons.
 
     element.addEventListener("change", function(event) {
       signal.value = event.target.files;
     });
 
-    this.setupFieldCleanup(fieldContainer, element, unsubscribe);
     this.setBasicAttributes(element, name);
     this.applyAttributes(element, attributes);
 
     fieldContainer.appendChild(element);
-    return [element, signal];
+    return [element, signal, []];
   }
 
   createRangeField(fieldContainer, name, attributes) {
@@ -289,12 +281,11 @@ export class SignalFieldGenerator {
       signal.value = event.target.value;
     });
 
-    this.setupFieldCleanup(fieldContainer, element, unsubscribe);
     this.setBasicAttributes(element, name);
     this.applyAttributes(element, attributes);
 
     fieldContainer.appendChild(element);
-    return [element, signal];
+    return [element, signal, [unsubscribe]];
   }
 
   createColorField(fieldContainer, name, attributes) {
@@ -310,12 +301,11 @@ export class SignalFieldGenerator {
       signal.value = event.target.value;
     });
 
-    this.setupFieldCleanup(fieldContainer, element, unsubscribe);
     this.setBasicAttributes(element, name);
     this.applyAttributes(element, attributes);
 
     fieldContainer.appendChild(element);
-    return [element, signal];
+    return [element, signal, [unsubscribe]];
   }
 
   createStandardInputField(fieldContainer, type, name, attributes) {
@@ -331,12 +321,11 @@ export class SignalFieldGenerator {
       signal.value = event.target.value;
     });
 
-    this.setupFieldCleanup(fieldContainer, element, unsubscribe);
     this.setBasicAttributes(element, name);
     this.applyAttributes(element, attributes);
 
     fieldContainer.appendChild(element);
-    return [element, signal];
+    return [element, signal, [unsubscribe]];
   }
 
   // Helper methods
@@ -345,12 +334,7 @@ export class SignalFieldGenerator {
     element.setAttribute("id", name);
   }
 
-  setupFieldCleanup(fieldContainer, element, unsubscribe) {
-    this.observeRemoval(fieldContainer, element, (removedNode) => {
-      console.log('The target node has been removed:', removedNode);
-      unsubscribe();
-    });
-  }
+
 
   applyAttributes(element, attributes) {
     Object.entries(attributes).forEach(([key, value]) => {
@@ -415,5 +399,74 @@ export class SignalFieldGenerator {
     });
 
     observer.observe(parent, config);
+  }
+}
+
+
+
+
+
+
+
+
+
+export class PropertiesForm {
+
+  constructor(device, manifest, database, target){
+    this.subscriptions = new Set();
+
+    this.device = device;
+    this.manifest = manifest;
+    this.database = database;
+    this.target = target;
+
+    this.spawn();
+  }
+
+  spawn(){
+
+    const generator = new SignalFieldGenerator();
+
+    const [elements, signals, unsubscriptions] = generator.generateFields(this.manifest.node.properties);
+
+    for(const element of elements){
+      this.target.appendChild(element);
+    }
+
+    unsubscriptions.forEach(subscription=>this.subscriptions.add(subscription));
+
+    // signals
+    const selectedStationRecord = this.database.records.get(this.device.id);
+
+    for(const fieldSignal of signals){
+      const propertyName = fieldSignal.identity;
+
+      // Pass existing value from the record to the UI
+      if(selectedStationRecord[propertyName]) fieldSignal.value = selectedStationRecord[propertyName];
+
+      // When the UI artefact changes value
+      fieldSignal.subscribe(value=>{
+        const activeRecord = this.database.records.get(this.device.id);
+        // assign that value to the appropriate record field
+        activeRecord[propertyName] = value;
+        // store the updated record in the database.
+        this.database.records.set(this.device.id, activeRecord);
+        console.log(`activeRecord: Updated database record ${this.device.id}/${propertyName}`, value)
+      });
+
+    }
+
+  }
+
+
+  terminate(){
+
+    // first terminate all signals
+    for (const unsubscribe of this.subscriptions) unsubscribe();
+    this.subscriptions.clear();
+
+    // then remove elements
+    this.target.replaceChildren();
+
   }
 }

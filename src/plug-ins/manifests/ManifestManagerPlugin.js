@@ -25,7 +25,7 @@ export class ManifestManagerPlugin extends Plugin {
     this.subscriptions.clear();
   }
 
-  async instantiateManifest({ agentType, id }) {
+  async instantiateManifest({ agentType }) {
 
     const manifest = await this.fetchManifest('agents', agentType);
     this.agentManifests.set(agentType, manifest);

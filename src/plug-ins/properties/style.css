@@ -1,6 +1,6 @@
 .properties {
   --properties-spacing: .5rem;
-  min-width: 13rem;
+  width: 13rem;
   min-height: 8rem;
   z-index: 1000;
 
@@ -32,7 +32,7 @@
 
   .form-row {
     padding: 0 var(--properties-spacing) ;
-    margin-bottom: 1rem;
+    margin-bottom: .5rem;
   }
 
   .field-description {

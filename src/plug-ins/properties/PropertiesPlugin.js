@@ -2,7 +2,7 @@ import { Plugin } from "../../core/Plugin.js";
 import { take } from "../../core/Utils.js";
 import { ReactiveSignal as Signal } from "../../core/Signal.js";
 
-import { SignalFieldGenerator } from "./SignalFieldGenerator.js";
+import { PropertiesForm, SignalFieldGenerator } from "./SignalFieldGenerator.js";
 
 export class PropertiesPlugin extends Plugin {
   app;
@@ -23,6 +23,9 @@ export class PropertiesPlugin extends Plugin {
     // this.agentInstances = this.stationManager.agentInstances;
     this.database = app.plugins.get('DatabasePlugin');
     // this.agentInstances = this.database.agentInstances;
+
+    this.manifestManager = app.plugins.get('ManifestManagerPlugin');
+    this.agentManifests = this.manifestManager.agentManifests;
 
     this.uiContainerElement = document.querySelector("#ui-container > .end-side");
     const htmlContent = `
@@ -51,95 +54,29 @@ export class PropertiesPlugin extends Plugin {
   }
 
   async showNodeProperties(station){
-
+    // Clear existing UI
+    if(this.form) this.form.terminate();
+    // Laad Manifest
     const manifest = await this.app.until('manifestAdded', station.agentType);
-    console.info('UNTIL', manifest, this.database.records.get(station.id))
-
-    // clear properties
-    this.propertyListElement.replaceChildren();
-
-
-    const fieldArray = manifest.node.properties;
-    const signalFieldGenerator = new SignalFieldGenerator();
-
-    const [elements, signals] = signalFieldGenerator.generateFields(fieldArray);
-
-    for(const element of elements){
-      this.propertyListElement.appendChild(element);
-    }
-
-    const record = this.database.records.get(station.id);
-    console.log(`Loaded record for station.id ${station.id}`, record);
-
-    for(const signal of signals){
-      const key = signal.identity;
-
-      if(record[key]) signal.value = record[key];
-      signal.subscribe(value=>{
-        record[key] = value;
-        this.database.records.set(station.id, record);
-        console.log(`Updated database record ${station.id}/${key}`, value)
-      })
-    }
-
-    // NOTE: use signls for control
-
+    // create new UI
+    this.form = new PropertiesForm(station, manifest, this.database, this.propertyListElement);
   }
 
-  showConnectionProperties(connection){
+  async showConnectionProperties(connection){
+    console.log('DDD connection.agentType', connection.agentType );
 
-  }
-
-  renderTools() {
-    // clear toolbox
-    this.propertyListElement.replaceChildren();
-
-    for (const toolsList of take(Object.entries(this.app.tools), this.toolColumns)) {
-      const row = document.createElement("div");
-      row.classList.add("row");
-      for (const [name, data] of toolsList) {
-        const col = document.createElement("div");
-        col.classList.add("col");
-        const toolElement = this.renderTool(name, data);
-        col.appendChild(toolElement);
-        row.appendChild(col);
-      }
-      this.propertyListElement.appendChild(row);
+    // Clear existing UI
+    if(this.form) this.form.terminate();
+    // Laad Manifest
+    // const manifest = await this.app.until('manifestAdded', connection.agentType);
+    let manifest = this.agentManifests.has(connection.agentType)? this.agentManifests.get(connection.agentType):null;
+    if(!manifest){
+      this.manifestManager.instantiateManifest(connection)
+      manifest = await this.app.until('manifestAdded', connection.agentType);
     }
-  } // renderTools
 
-
-
-
-  renderTool(toolName, toolData) {
-    const toolButton = document.createElement("button");
-    toolButton.classList.add("btn", "btn-sm");
-    toolButton.setAttribute("title", toolData.description);
-    toolButton.addEventListener("click", () => this.eventDispatch("selectTool", toolName));
-
-    const toolIcon = document.createElement("i");
-    toolButton.classList.add("bi", toolData.icon);
-
-    this.app.selectedTool.subscribe((selectedName) => {
-      if (selectedName === toolName) {
-        toolButton.classList.add("active");
-      } else {
-        toolButton.classList.remove("active");
-      }
-    });
-
-    this.app.selectedTool.subscribe((selectedName) => {
-      if (selectedName === toolName) {
-        toolButton.classList.remove(toolData.icon);
-        toolButton.classList.add(toolData.iconSelected);
-      } else {
-        toolButton.classList.remove(toolData.iconSelected);
-        toolButton.classList.add(toolData.icon);
-      }
-    });
-
-    toolButton.appendChild(toolIcon);
-
-    return toolButton;
+    // create new UI
+    this.form = new PropertiesForm(connection, manifest, this.database, this.propertyListElement);
   }
+
 } // class

@@ -13,7 +13,7 @@ export class Connection {
     startLabel: 'output>',
     centerLabel: 'connection',
     endLabel:'input>',
-    agentType: 'basic/pass-through',
+    agentType: 'basic/connection',
   };
 
   #acceptable = [
@@ -49,6 +49,8 @@ export class Connection {
   // reusable creator used by deserializer and constructor
   setup(options){
 
+    console.log('DDD', options)
+
     this.#signalStorage.id = new Signal(options.id??rid());
 
     this.#signalStorage.fromId = new Signal(options.fromId);
@@ -60,6 +62,8 @@ export class Connection {
     this.#signalStorage.centerLabel = new Signal(options.centerLabel);
     this.#signalStorage.endLabel = new Signal(options.endLabel);
     this.#signalStorage.agentType = new Signal(options.agentType);
+
+    console.log('DDD aft', this.serialize())
 
   }
 
