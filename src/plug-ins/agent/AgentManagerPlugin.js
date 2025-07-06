@@ -10,12 +10,16 @@ export class AgentManagerPlugin extends Plugin {
   constructor() {
     super();
     this.subscriptions = new Set();
-    this.agentManifests = new Map();
     this.agentInstances = new Map();
   }
 
   init(app) {
     this.app = app;
+
+
+    this.manifestManager = app.plugins.get('ManifestManagerPlugin');
+    this.agentManifests = this.manifestManager.agentManifests;
+
 
     this.app.on("stationAdded", (station) => this.instantiateAgent(station));
     this.app.on("stationRestored", (station) => this.instantiateAgent(station));
@@ -29,11 +33,12 @@ export class AgentManagerPlugin extends Plugin {
 
   async instantiateAgent({ agentType, id }) {
 
-    // load manifest
-    const manifest = await this.fetchManifest('agents', agentType);
-    this.agentManifests.set(agentType, manifest);
-    this.eventDispatch('manifestAdded', manifest);
-    // console.log(manifest);
+   // NOTE: this works too
+   // let manifest = this.agentManifests.has(agentType)? this.agentManifests.get(agentType): null;
+   // if(manifest === null)  manifest = this.manifestManager.load(agentType);
+   // NOTE: and this: const manifest = this.agentManifests.has(agentType)? this.agentManifests.get(agentType): await this.app.until('manifestAdded', agentType);
+
+    const manifest = await this.app.until('manifestAdded', agentType);
 
     // load main file as specified in manifest
     const Agent = await this.fetchClass('agents', agentType, manifest.files.main);
@@ -49,20 +54,7 @@ export class AgentManagerPlugin extends Plugin {
     this.agentInstances.delete(id);
   }
 
-  async fetchManifest(agentRoot, basePath, fileName = "manifest.json") {
-    const url = [window.location.origin, agentRoot, basePath, fileName].join('/');
-    try {
-      const response = await fetch(url); // Replace with your manifest file path
-      if (!response.ok) {
-        throw new Error("Network response was not ok " + response.statusText);
-      }
-      const manifest = await response.json();
-      //console.log(manifest); // Do something with the manifest data
-      return manifest;
-    } catch (error) {
-      console.error("There was a problem with the fetch operation:", error);
-    }
-  }
+
 
 
 

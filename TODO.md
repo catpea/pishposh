@@ -1,1 +1,1 @@
-EventEmitter is now ion Signal and Signal is now LBits
+[] - Field Generator Needs A Tiny MVC Architecture - signal monitoring is incorrectly configured, signals are not removed

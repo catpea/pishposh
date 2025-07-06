@@ -1,30 +1,8 @@
-class EventEmitter {
-  constructor() {
-    this.events = {};
-  }
+import { EventEmitter } from "../../core/Signal.js";
 
-  on(event, listener) {
-    if (!this.events[event]) {
-      this.events[event] = [];
-    }
-    this.events[event].push(listener);
-    return this;
-  }
-
-  off(event, listener) {
-    if (!this.events[event]) return this;
-    this.events[event] = this.events[event].filter(l => l !== listener);
-    return this;
-  }
-
-  emit(event, ...args) {
-    if (!this.events[event]) return false;
-    this.events[event].forEach(listener => listener(...args));
-    return true;
-  }
-}
 
 export class PersistentMap extends EventEmitter {
+  ready = false;
   constructor(data = null, options = {}) {
     super();
 
@@ -61,13 +39,17 @@ export class PersistentMap extends EventEmitter {
   }
 
   _loadKeys() {
+
     try {
       const keysJson = localStorage.getItem(this._keysKey);
       this._keys = keysJson ? new Set(JSON.parse(keysJson)) : new Set();
-      this.emit('restored', this);
     } catch (e) {
       this._keys = new Set();
     }
+
+    this.ready = true;
+    this.emit('restored', this);
+    this.emit('ready', this);
   }
 
   _saveKeys() {

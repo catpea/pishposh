@@ -1,30 +1,8 @@
-class EventEmitter {
-  constructor() {
-    this.events = {};
-  }
-
-  on(event, listener) {
-    if (!this.events[event]) {
-      this.events[event] = [];
-    }
-    this.events[event].push(listener);
-    return this;
-  }
-
-  off(event, listener) {
-    if (!this.events[event]) return this;
-    this.events[event] = this.events[event].filter(l => l !== listener);
-    return this;
-  }
-
-  emit(event, ...args) {
-    if (!this.events[event]) return false;
-    this.events[event].forEach(listener => listener(...args));
-    return true;
-  }
-}
+import { EventEmitter } from "../../core/Signal.js";
 
 export class PersistentSet extends EventEmitter {
+  ready = false;
+
   constructor(iterable = null, options = {}) {
     super();
 
@@ -57,10 +35,12 @@ export class PersistentSet extends EventEmitter {
     try {
       const valuesJson = localStorage.getItem(this._valuesKey);
       this._values = valuesJson ? new Set(JSON.parse(valuesJson)) : new Set();
-      this.emit('restored', this);
     } catch (e) {
       this._values = new Set();
     }
+    this.ready = true;
+    this.emit('restored', this);
+    this.emit('ready', this);
   }
 
   _saveValues() {

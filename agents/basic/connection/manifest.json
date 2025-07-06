@@ -1,5 +1,5 @@
 {
-  "name": "basic/connection",
+  "id": "basic/connection",
   "version": "1.2.3",
   "description": "Applies various image filters with real-time preview and adjustable parameters",
   "author": {

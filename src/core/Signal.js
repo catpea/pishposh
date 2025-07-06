@@ -11,6 +11,7 @@ export class EventEmitter {
   eventNames;
 
   constructor() {
+    this.actionReplay = new Map(); // we store the last event
     this.eventNames = new Map();
     this.subscriptions = new Set();
 
@@ -40,14 +41,30 @@ export class EventEmitter {
   }
 
 
+  until(eventName, id){
+    if(this.actionReplay.has(eventName+'#'+id)){
+      console.log(`UNTIL has ${eventName+'#'+id}`, this.actionReplay.get(eventName+'#'+id));
+      return this.actionReplay.get(eventName+'#'+id);
+    }
 
 
+    return new Promise(resolve => {
+     const off = this.on(eventName, data => {
+       console.log('UNTIL', data)
+        if(data.id == id){
+          resolve(data);
+          off();
+        }
+      });
+    });
+  }
 
   once(eventName) {
+
      return new Promise((resolve, reject) => {
        const onEvent = (...args) => {
          this.off('error', onError);
-         resolve(args);
+         resolve(...args);
        };
        const onError = (error) => {
          this.off(eventName, onEvent);
@@ -73,10 +90,14 @@ export class EventEmitter {
     this.eventNames.get(event).delete(subscriber);
   }
 
-  emit(event, data) {
-    const subscribers = this.eventNames.get(event) ?? new Set();
+  emit(eventName, eventData, actionReplay=true) { // actionReplay is true by default
+
+    if(actionReplay&&eventData.id) this.actionReplay.set(eventName+'#'+eventData.id, eventData);
+
+
+    const subscribers = this.eventNames.get(eventName) ?? new Set();
     for (const subscriber of subscribers) {
-      subscriber(data);
+      subscriber(eventData);
     }
   }
 
@@ -123,12 +144,11 @@ export class SetTimeoutEmitter extends EventEmitter {
 
 class SpicyEmitter extends EventEmitter {
 
-  async deferredEmit(eventName, eventData, condFn, ttl, ttlExceptionFn) {
-    console.info('deferredEmit', eventName, eventData, condFn, ttl, ttlExceptionFn)
-    // Early exit: check if condition is immediately satisfied
-    console.info('XXXXXXXXXXX condFn', condFn, condFn);
 
-    const condResult = condFn(eventData);
+
+  async deferredEmit(eventName, eventData, condFn, ttl, ttlExceptionFn) {
+
+    const condResult = await condFn(eventData);
 
     console.info('XXXXXXXXXXX condResult', condResult);
 
@@ -330,6 +350,9 @@ export class ReactiveEmitter extends StreamEmitter {
 }
 
 export class Signal {
+
+  identity; // user controller arbitrary value
+
   name = "Signal";
   #id;
   #value;

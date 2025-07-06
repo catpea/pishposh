@@ -19,9 +19,10 @@ export class PropertiesPlugin extends Plugin {
     this.app = app;
     this.svg = app.svg;
 
-    this.stationManager = app.plugins.get('AgentManagerPlugin');
-    this.agentInstances = this.stationManager.agentInstances;
-    this.agentManifests = this.stationManager.agentManifests;
+    // this.stationManager = app.plugins.get('AgentManagerPlugin');
+    // this.agentInstances = this.stationManager.agentInstances;
+    this.database = app.plugins.get('DatabasePlugin');
+    // this.agentInstances = this.database.agentInstances;
 
     this.uiContainerElement = document.querySelector("#ui-container > .end-side");
     const htmlContent = `
@@ -49,15 +50,16 @@ export class PropertiesPlugin extends Plugin {
     this.subscriptions.clear();
   }
 
-  showNodeProperties(station){
-    console.log(station.agentType)
-    console.log(this.agentManifests.get(station.agentType))
+  async showNodeProperties(station){
+
+    const manifest = await this.app.until('manifestAdded', station.agentType);
+    console.info('UNTIL', manifest, this.database.records.get(station.id))
 
     // clear properties
     this.propertyListElement.replaceChildren();
 
 
-    const fieldArray = this.agentManifests.get(station.agentType).node.properties;
+    const fieldArray = manifest.node.properties;
     const signalFieldGenerator = new SignalFieldGenerator();
 
     const [elements, signals] = signalFieldGenerator.generateFields(fieldArray);
@@ -66,8 +68,18 @@ export class PropertiesPlugin extends Plugin {
       this.propertyListElement.appendChild(element);
     }
 
+    const record = this.database.records.get(station.id);
+    console.log(`Loaded record for station.id ${station.id}`, record);
+
     for(const signal of signals){
-      signal.subscribe(v=>console.log('Value changed for ', station, signal.name, v))
+      const key = signal.identity;
+
+      if(record[key]) signal.value = record[key];
+      signal.subscribe(value=>{
+        record[key] = value;
+        this.database.records.set(station.id, record);
+        console.log(`Updated database record ${station.id}/${key}`, value)
+      })
     }
 
     // NOTE: use signls for control

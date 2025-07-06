@@ -10,7 +10,10 @@ export class Station {
     y:0,
     r:32,
     label: 'Untitled',
+
+
     agentType: 'basic/pass-through',
+
   };
 
   #acceptable = [
@@ -33,6 +36,7 @@ export class Station {
     this.#signalStorage.id = new Signal(options.id??rid());
     this.#signalStorage.agentType = new Signal(options.agentType);
     this.#signalStorage.label = new Signal(options.label);
+
     this.#signalStorage.x = new Signal(options.x);
     this.#signalStorage.y = new Signal(options.y);
     this.#signalStorage.r = new Signal(options.r);
