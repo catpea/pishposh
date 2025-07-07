@@ -38,19 +38,26 @@ export class ConnectionRenderPlugin extends Plugin {
   }
 
   removeConnection(id) {
-    console.log('AAA', 'RENDERER removeConnection');
     const path = this.svg.querySelector(`.connection-path[data-connection-id="${id}"]`);
     const labels = this.svg.querySelectorAll(`.connection-label[data-connection-id="${id}"]`);
+
     if (path) path.remove();
     labels.forEach((el) => el.remove());
   }
 
   renderConnection(connection) {
 
-    console.log('renderConnection', connection)
+    console.log('BBB renderConnection', connection.serialize())
+    console.log('BBB port instances', ...this.portInstances.keys())
 
-    const fromPort = this.portInstances.get(connection.fromId);
-    const toPort = this.portInstances.get(connection.toId);
+    const fromPort = this.portInstances.get(connection.fromPortId);
+    const toPort   = this.portInstances.get(connection.toPortId);
+
+    // if (!fromPort || !toPort) return setTimeout(()=>this.renderConnection(connection),333);
+
+
+    if (!fromPort) throw new Error(`fromPort not found in portInstances (${connection.fromPortId})`);
+    if (!toPort) throw new Error(`toPort not found in portInstances (${connection.toPortId})`);
 
     console.log('renderConnection', {from: fromPort, to: toPort})
 
@@ -61,6 +68,7 @@ export class ConnectionRenderPlugin extends Plugin {
       console.log('TT', fromPort || toPort);
       if (!fromPort || !toPort) return;
     }
+
 
 
     const pathId = `path-${connection.id}`;

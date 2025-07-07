@@ -16,14 +16,17 @@ export class AgentManagerPlugin extends Plugin {
   init(app) {
     this.app = app;
 
-
     this.manifestManager = app.plugins.get('ManifestManagerPlugin');
     this.agentManifests = this.manifestManager.agentManifests;
 
-
-    this.app.on("stationAdded", (station) => this.instantiateAgent(station));
-    this.app.on("stationRestored", (station) => this.instantiateAgent(station));
+    this.app.on("stationAdded", (station) => this.instantiateStationAgent(station));
+    this.app.on("stationRestored", (station) => this.instantiateStationAgent(station));
     this.app.on("stationRemoved", (id) => this.destroyAgent(id));
+
+    this.app.on("connectionAdded", (connection) => this.instantiateConnectionAgent(connection));
+    this.app.on("connectionRestored", (connection) => this.instantiateConnectionAgent(connection));
+    this.app.on("connectionRemoved", (id) => this.destroyAgent(id));
+
   }
 
   stop() {
@@ -31,28 +34,71 @@ export class AgentManagerPlugin extends Plugin {
     this.subscriptions.clear();
   }
 
-  async instantiateAgent({ agentType, id }) {
+  async instantiateStationAgent(data) {
+    const agent = await this.instantiateAgent(data);
+    this.agentInstances.set(data.id, agent);
+    this.eventDispatch('stationAgentAdded', agent);
 
-   // NOTE: this works too
-   // let manifest = this.agentManifests.has(agentType)? this.agentManifests.get(agentType): null;
-   // if(manifest === null)  manifest = this.manifestManager.load(agentType);
-   // NOTE: and this: const manifest = this.agentManifests.has(agentType)? this.agentManifests.get(agentType): await this.app.until('manifestAdded', agentType);
+    await agent.start();
+    this.eventDispatch('stationAgentStarted', agent);
 
-    const manifest = await this.app.until('manifestAdded', agentType);
+  }
+  async instantiateConnectionAgent(connection) {
+    console.warn('instantiateConnectionAgent', connection);
+
+    if(connection.fromId) connection.fromEmitter =  this.agentInstances.get(connection.fromId)
+    if(connection.toId) connection.toEmitter =  this.agentInstances.get(connection.toId)
+    if(connection.fromPortName && connection.toPortName) connection.mapping = [ {fromEvent:connection.fromPortName, toEvent:connection.toPortName, transformer: data=>data } ];
+
+    const agent = await this.instantiateAgent(connection);
+    this.agentInstances.set(connection.id, agent);
+    this.eventDispatch('connectionAgentAdded', agent);
+
+    await agent.start();
+    this.eventDispatch('connectionAgentStarted', agent);
+
+  }
+
+  async instantiateAgent(data) {
+    console.log('Instantiate Agent', data.agentType);
+
+   let manifest = this.agentManifests.has(data.agentType)? this.agentManifests.get(data.agentType):null;
+    if(!manifest){
+      this.manifestManager.instantiateManifest(data)
+      manifest = await this.app.until('manifestAdded', data.agentType);
+    }
 
     // load main file as specified in manifest
-    const Agent = await this.fetchClass('agents', agentType, manifest.files.main);
-    const agent = new Agent({ id });
-    this.agentInstances.set(id, agent);
-    this.eventDispatch('agentAdded', agent);
+    const Agent = await this.fetchClass('agents', data.agentType, manifest.files.main);
 
+    const agent = new Agent(data);
+    return agent;
   }
 
-  destroyAgent(id) {
+
+
+
+
+
+  async destroyAgent(id) {
     const agent = this.agentInstances.get(id);
-    agent.stop();
+
     this.agentInstances.delete(id);
+    this.eventDispatch('agentRemoved', agent);
+
+    await agent.stop();
+    this.eventDispatch('agentStopped', agent);
+
   }
+
+
+
+
+
+
+
+
+
 
 
 

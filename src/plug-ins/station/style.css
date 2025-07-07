@@ -3,7 +3,7 @@
 }
 .station-circle {
   fill: var(--base03);
-  stroke: var(--text);
+  stroke: var(--base01);
   stroke-width: 3;
 }
 .station-circle.selected {

@@ -50,6 +50,7 @@ export class GhostLinePlugin extends Plugin {
 
     const fromPortId = e.target.dataset.portId;
     const fromPort = this.portInstances.get(fromPortId);
+    const fromPortName = fromPort.name;
 
     const fromStationId = e.target.dataset.stationId;
     const fromStation = this.portInstances.get(fromPortId);
@@ -58,6 +59,7 @@ export class GhostLinePlugin extends Plugin {
 
     this.isConnecting = true;
     this.fromPortId = fromPortId;
+    this.fromPortName = fromPortName;
     this.fromStationId = fromStationId;
 
     const fromPos = { x: fromPort.x.value, y: fromPort.y.value };
@@ -87,16 +89,23 @@ export class GhostLinePlugin extends Plugin {
     if (e.target.classList.contains("station-port")) {
       const toStationId = e.target.dataset.stationId;
       const toPortId = e.target.dataset.portId;
+      const toPortName = e.target.dataset.portName;
       if (toPortId !== this.fromPortId) {
 
         // this.app.emit("beforeConnectionCreate", { from: this.fromStationId, to: toStationId });
         // const connection = this.graph.addConnection({ fromId: this.fromStationId, toId: toStationId, type: "ConnectionAgent" });
         const connection = {
-          fromStationId: this.fromStationId,
-          fromId: this.fromPortId,
-          toStationId: toStationId,
-          toId: toPortId,
-          type: "ConnectionAgent" }
+
+          fromId: this.fromStationId,
+          fromPortId: this.fromPortId,
+          fromPortName: this.fromPortName,
+
+          toId: toStationId,
+          toPortId: toPortId,
+          toPortName: toPortName,
+
+        }
+        console.info("BBB connectionAddRequest", connection)
         this.app.emit("connectionAddRequest", connection);
 
       }

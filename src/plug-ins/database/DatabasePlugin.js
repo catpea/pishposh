@@ -57,19 +57,23 @@ export class DatabasePlugin {
     this.app.on('stationUpdated', data => this.stations.set(data.id, data.serialize()));
     this.app.on('stationRemoved', id => this.stations.delete(id));
 
+    this.app.on('stationAdded', data => records.set(data.id, {}));
+    this.app.on('stationRemoved', id => records.delete(id));
 
     // What you see here is Applied Reactive Emitter Programming. Function being used is called deferredEmit
     // deferredEmit is part of the local EventEmitter system
     // NOTE: a connection cannot be restored until the nodes it connects are loaded!
     // NOTE: fromId, toId are just from the connection data in the Map
-    const restoreConnectionOrchestrator = async ({id, fromId, toId}) => {
+    const restoreConnectionOrchestrator = async ({id,  fromPortId,   toPortId}) => {
+
+      console.log('ZZZ', {fromId: fromPortId, toId: toPortId})
 
       if(!this.records.ready) await records.once('ready');
       if(!records.has(id)) records.set(id, {}); // the record was not in database, set a blank object and bail
 
       const expectData = new Map();
-      expectData.set(fromId, this.portInstances.has(fromId));
-      expectData.set(toId, this.portInstances.has(toId));
+      expectData.set(fromPortId, this.portInstances.has(fromPortId));
+      expectData.set(toPortId, this.portInstances.has(toPortId));
 
       const test = () => {
         for (const value of expectData.values()) {
@@ -94,7 +98,11 @@ export class DatabasePlugin {
 
     this.connections = new PersistentMap(null, {prefix: 'pishposh-connections', onRestored:db=>db.forEach((v,k)=>this.app.deferredEmit('connectionRestore', v, restoreConnectionOrchestrator, 1000, (eventName, eventData, ttl, error) => console.error(`Failed to emit ${eventName} within ${ttl}ms`, error)) )});
     this.app.on('connectionAdded', data => this.connections.set(data.id, data.serialize()));
+    this.app.on('connectionUpdated', data => this.connections.set(data.id, data.serialize()));
     this.app.on('connectionRemoved', id => this.connections.delete(id));
+
+    this.app.on('connectionAdded', data => records.set(data.id, {}));
+    this.app.on('connectionRemoved', id => records.delete(id));
 
 
 

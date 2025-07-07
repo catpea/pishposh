@@ -6,8 +6,8 @@ export class Connection {
   #signalStorage = {};
 
   #defaults = {
-    fromStationId:0,
-    toStationId:0,
+    fromPortId:0,
+    toPortId:0,
     fromId:0,
     toId:0,
     startLabel: 'output>',
@@ -20,8 +20,10 @@ export class Connection {
     'id',
     'fromId',
     'toId',
-    'fromStationId',
-    'toStationId',
+    'fromPortId',
+    'fromPortName',
+    'toPortId',
+    'toPortName',
     'startLabel',
     'centerLabel',
     'endLabel',
@@ -32,8 +34,10 @@ export class Connection {
     'id',
     'fromId',
     'toId',
-    'fromStationId',
-    'toStationId',
+    'fromPortId',
+    'fromPortName',
+    'toPortId',
+    'toPortName',
     'startLabel',
     'centerLabel',
     'endLabel',
@@ -53,17 +57,17 @@ export class Connection {
 
     this.#signalStorage.id = new Signal(options.id??rid());
 
-    this.#signalStorage.fromId = new Signal(options.fromId);
     this.#signalStorage.toId = new Signal(options.toId);
-    this.#signalStorage.fromStationId = new Signal(options.fromStationId);
-    this.#signalStorage.toStationId = new Signal(options.toStationId);
+    this.#signalStorage.toPortId = new Signal(options.toPortId);
+    this.#signalStorage.toPortName = new Signal(options.toPortName);
+    this.#signalStorage.fromId = new Signal(options.fromId);
+    this.#signalStorage.fromPortId = new Signal(options.fromPortId);
+    this.#signalStorage.fromPortName = new Signal(options.fromPortName);
 
     this.#signalStorage.startLabel = new Signal(options.startLabel);
     this.#signalStorage.centerLabel = new Signal(options.centerLabel);
     this.#signalStorage.endLabel = new Signal(options.endLabel);
     this.#signalStorage.agentType = new Signal(options.agentType);
-
-    console.log('DDD aft', this.serialize())
 
   }
 
@@ -91,11 +95,17 @@ export class Connection {
   get toId(){ return this.#signalStorage.toId.value; }
   set toId(v){ this.#signalStorage.toId.value = v; }
 
-  get fromStationId(){ return this.#signalStorage.fromStationId.value; }
-  set fromStationId(v){ this.#signalStorage.fromStationId.value = v; }
+  get fromPortId(){ return this.#signalStorage.fromPortId.value; }
+  set fromPortId(v){ this.#signalStorage.fromPortId.value = v; }
 
-  get toStationId(){ return this.#signalStorage.toStationId.value; }
-  set toStationId(v){ this.#signalStorage.toStationId.value = v; }
+  get fromPortName(){ return this.#signalStorage.fromPortName.value; }
+  set fromPortName(v){ this.#signalStorage.fromPortName.value = v; }
+
+  get toPortId(){ return this.#signalStorage.toPortId.value; }
+  set toPortId(v){ this.#signalStorage.toPortId.value = v; }
+
+  get toPortName(){ return this.#signalStorage.toPortName.value; }
+  set toPortName(v){ this.#signalStorage.toPortName.value = v; }
 
   get startLabel(){ return this.#signalStorage.startLabel.value; }
   set startLabel(v){ this.#signalStorage.startLabel.value = v; }

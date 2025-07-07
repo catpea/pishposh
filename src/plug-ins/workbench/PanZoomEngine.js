@@ -221,4 +221,201 @@ export class PanZoomEngine {
           };
       }
 
+
+
+
+
+
+
+
+
+
+
+// SVG explicitOriginalTarget polyfill
+
+
+  getExplicitOriginalTarget(event) {
+  // Firefox native support
+  if (event.explicitOriginalTarget) {
+    return event.explicitOriginalTarget;
+  }
+
+  // Polyfill for other browsers
+  const target = event.target;
+
+  // If target is already a graphic element, return it
+  if (isGraphicElement(target)) {
+    return target;
+  }
+
+  // Use elementFromPoint as fallback
+  const point = getEventPoint(event);
+  if (point) {
+    const elementAtPoint = document.elementFromPoint(point.x, point.y);
+    if (elementAtPoint && isGraphicElement(elementAtPoint)) {
+      return elementAtPoint;
+    }
+  }
+
+  // Last resort: traverse up from target to find graphic element
+  let current = target;
+  while (current && current !== document) {
+    if (isGraphicElement(current)) {
+      return current;
+    }
+    current = current.parentNode;
+  }
+
+  return target; // Fallback to original target
+}
+
+
+
+
+
+  isGraphicElement(element) {
+  if (!element || !element.tagName) return false;
+
+  const graphicElements = [
+    'circle', 'ellipse', 'line', 'path', 'polygon', 'polyline',
+    'rect', 'text', 'tspan', 'textPath', 'image', 'use'
+  ];
+
+  return graphicElements.includes(element.tagName.toLowerCase());
+}
+
+
+
+
+
+  getEventPoint(event) {
+  // Try to get coordinates from the event
+  if (event.clientX !== undefined && event.clientY !== undefined) {
+    return { x: event.clientX, y: event.clientY };
+  }
+
+  // Handle touch events
+  if (event.touches && event.touches.length > 0) {
+    return { x: event.touches[0].clientX, y: event.touches[0].clientY };
+  }
+
+  // Handle changed touches for touchend
+  if (event.changedTouches && event.changedTouches.length > 0) {
+    return { x: event.changedTouches[0].clientX, y: event.changedTouches[0].clientY };
+  }
+
+  return null;
+}
+
+
+
+
+// Enhanced version that handles nested SVG and shadow DOM
+  getExplicitOriginalTargetAdvanced(event) {
+  if (event.explicitOriginalTarget) {
+    return event.explicitOriginalTarget;
+  }
+
+  const point = getEventPoint(event);
+  if (!point) return event.target;
+
+  // Get all elements at the point (including those in shadow DOM)
+  const elementsAtPoint = document.elementsFromPoint(point.x, point.y);
+
+  // Find the first graphic element
+  for (const element of elementsAtPoint) {
+    if (isGraphicElement(element)) {
+      return element;
+    }
+  }
+
+  return event.target;
+}
+
+// Usage example:
+  handleSVGClick(event) {
+  const actualTarget = getExplicitOriginalTarget(event);
+  console.log('Clicked element:', actualTarget);
+  console.log('Element type:', actualTarget.tagName);
+
+  // You can now work with the actual graphic element
+  if (actualTarget.tagName === 'circle') {
+    console.log('Circle radius:', actualTarget.getAttribute('r'));
+  }
+}
+
+//USAGE  Add event listener
+//document.addEventListener('click', function(event) {
+  // Only handle clicks on SVG elements
+  //if (event.target.closest('svg')) {
+    //handleSVGClick(event);
+//  }
+//});
+
+// Alternative: More robust version using intersection with bounding boxes
+  getExplicitOriginalTargetByBounds(event) {
+  if (event.explicitOriginalTarget) {
+    return event.explicitOriginalTarget;
+  }
+
+  const point = getEventPoint(event);
+  if (!point) return event.target;
+
+  const svg = event.target.closest('svg');
+  if (!svg) return event.target;
+
+  // Convert screen coordinates to SVG coordinates
+  const svgPoint = screenToSVGPoint(svg, point.x, point.y);
+
+  // Find all graphic elements and check which one contains the point
+  const graphicElements = svg.querySelectorAll('circle, ellipse, line, path, polygon, polyline, rect, text, tspan, textPath, image, use');
+
+  for (const element of graphicElements) {
+    if (elementContainsPoint(element, svgPoint)) {
+      return element;
+    }
+  }
+
+  return event.target;
+}
+
+  screenToSVGPoint(svg, screenX, screenY) {
+  const point = svg.createSVGPoint();
+  point.x = screenX;
+  point.y = screenY;
+  return point.matrixTransform(svg.getScreenCTM().inverse());
+}
+
+  elementContainsPoint(element, point) {
+  try {
+    // For basic shapes, check bounding box
+    const bbox = element.getBBox();
+    if (point.x >= bbox.x && point.x <= bbox.x + bbox.width &&
+        point.y >= bbox.y && point.y <= bbox.y + bbox.height) {
+
+      // For paths, do more precise hit testing if available
+      if (element.tagName === 'path' && element.isPointInFill) {
+        return element.isPointInFill(point);
+      }
+
+      return true;
+    }
+  } catch (e) {
+    // getBBox might fail for some elements
+    return false;
+  }
+
+  return false;
+}
+
+
+
+
+
+
+
+
+
+
+
 }

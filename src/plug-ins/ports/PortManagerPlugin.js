@@ -25,7 +25,7 @@ export class PortManagerPlugin extends Plugin {
     this.stationInstances = this.stationManager.stationInstances;
 
 
-    this.app.on("agentAdded", (agent) => this.instantiatePorts(agent));
+    this.app.on("stationAgentAdded", (agent) => this.instantiatePorts(agent));
 
     this.app.on("agentRemoved", (id) => this.destroyPorts(id));
     this.app.on("stationRemoved", (id) => this.destroyPorts(id));
@@ -40,6 +40,7 @@ export class PortManagerPlugin extends Plugin {
   }
 
   async instantiatePorts(agent) {
+
     const {id} = agent;
 
     const station = this.stationInstances.get(id);
@@ -58,21 +59,24 @@ export class PortManagerPlugin extends Plugin {
 
 
     for(const portData of manifest.node.inputs){
-      const id = [station.id, 'port', 'input', portData.id].join('-');
+      const id = [station.id, 'input', portData.id].join(':');
+      const portName = ['input', portData.id].join(':');
       const angle = 0;
-      leftHemisphere.push({id, stationId:station.id, angle, portData});
+      leftHemisphere.push({id, portName, stationId:station.id, angle, portData});
     }
     for(const property of manifest.node.properties){
       for(const portData of property.ports){
-        const id = [station.id, 'port', 'property', property.id, 'port', portData.id].join('-');
+        const id = [station.id, 'property', property.id, portData.id].join(':');
+        const portName = ['property', property.id, portData.id].join(':');
         const angle = 0;
-        leftHemisphere.push({id, stationId:station.id, angle, portData});
+        leftHemisphere.push({id, portName, stationId:station.id, angle, portData});
       }
     }
     for(const portData of manifest.node.outputs){
-      const id = [station.id, 'port', 'input', portData.id].join('-');
+      const id = [station.id, 'output', portData.id].join(':');
+      const portName = ['output', portData.id].join(':');
       const angle = 0;
-      rightHemisphere.push({id, stationId:station.id, angle, portData});
+      rightHemisphere.push({id, portName, stationId:station.id, angle, portData});
     }
 
 
@@ -95,11 +99,13 @@ export class PortManagerPlugin extends Plugin {
 
       portElement.setAttribute("class", "station-port");
       portElement.setAttribute("data-port-id", rawPort.id);
+      portElement.setAttribute("data-port-name", rawPort.portName);
       portElement.setAttribute("data-station-id", station.id);
       portElement.setAttribute("r", portRadius);
 
       const port = {
         id: rawPort.id,
+        name: rawPort.portName,
         stationId: station.id,
         portElement,
         x: new Signal(0),
@@ -107,7 +113,8 @@ export class PortManagerPlugin extends Plugin {
         unsubscribe: new Set(),
       };
 
-      this.portInstances.set(rawPort.id, port);
+      console.log('BBB portInstances.set', port.id, port)
+      this.portInstances.set(port.id, port);
 
       const unsubscribeCx = port.x.subscribe(v=>portElement.setAttribute("cx", v));
       const unsubscribeCy = port.y.subscribe(v=>portElement.setAttribute("cy", v));

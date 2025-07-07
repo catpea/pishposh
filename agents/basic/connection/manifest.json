@@ -87,7 +87,11 @@
       "stability": "stable"
     }
 
+  },
+  "files": {
+    "main": "index.js",
+    "icon": "assets/icon.svg",
+    "documentation": "README.md"
   }
-
 
 }

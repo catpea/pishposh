@@ -1,9 +1,19 @@
-export default class PassThrough {
+import { EventEmitter } from "events";
+
+export default class PassThrough extends EventEmitter {
   id;
   constructor({id}){
+    super()
     this.id = id;
-    // console.log('PassThrough DDDDDDDDDDDDDDDDDDDDDDD');
   }
-  start(){}
-  stop(){}
+  async start(){
+    console.log('AGENT START', this.constructor.name)
+
+
+  }
+  async stop(){
+    console.log('AGENT STOP', this)
+
+
+  }
 }
